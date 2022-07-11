@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 
 import dj_database_url
-import django_on_heroku
 import dotenv
 
 dotenv.load_dotenv()
@@ -167,5 +166,3 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
-
-# django_on_heroku.settings(locals())
