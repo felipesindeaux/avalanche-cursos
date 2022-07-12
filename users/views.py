@@ -10,6 +10,14 @@ from .serializers import (AccountSerializer, LoginSerializer,
                           UpdateAccountSerializer,
                           UpdateStatusAccountSerializer)
 
+
+class ManagementUserView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UpdateStatusAccountSerializer
+
+    lookup_url_kwarg = 'id'
+
+
 class ListUsersView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = AccountSerializer

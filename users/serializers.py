@@ -51,7 +51,7 @@ class UpdateStatusAccountSerializer(serializers.ModelSerializer):
             "name",
             "email",
             "is_teacher",
-            "password"
+            "password",
             "is_active"
             ]
         read_only_fields = [
