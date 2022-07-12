@@ -15,6 +15,10 @@ from .serializers import (AccountSerializer, LoginSerializer,
 
 
 class ManagementUserView(generics.UpdateAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
+
     queryset = User.objects.all()
     serializer_class = UpdateStatusAccountSerializer
 
