@@ -48,7 +48,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = ["rest_framework", "rest_framework.authtoken", "drf_spectacular"]
 
-MY_APPS = ["users", "categories"]
+MY_APPS = ["users", "categories", "lessons"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 
