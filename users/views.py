@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import (IsAuthenticated,
+from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.views import APIView, Response, status
 
@@ -22,6 +22,10 @@ class ManagementUserView(generics.UpdateAPIView):
 
 
 class ListUsersView(generics.ListAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
+
     queryset = User.objects.all()
     serializer_class = AccountSerializer
 
