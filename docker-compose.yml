@@ -8,19 +8,27 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
+    ports:
+      - 8000:8000
     stdin_open: true
     tty: true
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:latest
     env_file: .env
     ports:
-      - 45432:5432
+      - 45433:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: psql -U $POSTGRES_USER $POSTGRES_DB || exit 1
       interval: 1s
       timeout: 5s
       retries: 5
       start_period: 5m
+     
+volumes:
+  pgdata:
