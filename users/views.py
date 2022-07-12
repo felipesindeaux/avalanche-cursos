@@ -4,23 +4,23 @@ from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView, Response, status
 
+from .mixins import SerializerByMethodMixin
 from .models import User
 from .serializers import (AccountSerializer, LoginSerializer,
                           UpdateAccountSerializer,
                           UpdateStatusAccountSerializer)
-
-class UpdateUserView(generics.UpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UpdateAccountSerializer
 
 class ListUsersView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = AccountSerializer
 
 
-class RetrieveUserView(generics.RetrieveAPIView):
+class RetrieveUpdateUserView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = AccountSerializer
+    serializer_map = {
+        "GET": AccountSerializer,
+        "PATCH": UpdateAccountSerializer,
+    }
 
 
 class RegisterView(generics.CreateAPIView):
