@@ -1,3 +1,4 @@
+from unicodedata import category
 from django.db import models
 
 class Course(models.Model):
@@ -11,3 +12,4 @@ class Course(models.Model):
     is_active = models.BooleanField(default=True)
 
     owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="courses")
+    category = models.ManyToManyField("categories.Category", on_delete=models.CASCADE, related_name="courses")

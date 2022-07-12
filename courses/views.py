@@ -5,7 +5,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from courses.models import Course
-from courses.serializers import CourseSerializer
+from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
+
+from categories.models import Category
 
 from .permissions import IsAdminToDelete, IsTeacher
 
@@ -23,6 +25,13 @@ class CreateListCourseView(generics.ListCreateAPIView):
 
 
     def perform_create(self, serializer):
+
+        categories = self.request.data.pop("categories")
+
+        for category in categories:
+            cat = Category.objects.get_or_create(category=category)[0]
+            serializer.category.add(cat)
+
         serializer.save(owner=self.request.user)
 
 class UpdateListCourseView(generics.RetrieveUpdateDestroyAPIView):
@@ -40,3 +49,17 @@ class ListTeacherCoursesView(generics.ListAPIView):
 
     def get_queryset(self):    
         return Course.objects.filter(owner=self.request.user)
+
+class ActivateCourseView(generics.UpdateAPIView):
+    serializer_class = UpdateStatusCourseSerializer
+    queryset = Course.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save(is_active=True)
+
+class DeactivateCourseView(generics.UpdateAPIView):
+    serializer_class = UpdateStatusCourseSerializer
+    queryset = Course.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save(is_active=False)
