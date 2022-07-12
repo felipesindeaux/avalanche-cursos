@@ -86,13 +86,17 @@ WSGI_APPLICATION = "avalanche.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-if os.getenv("TEST"):
+if os.getenv("LOCAL"):
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": os.getenv("POSTGRES_DB"),
+                "USER": os.getenv("POSTGRES_USER"),
+                "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+                "HOST": "localhost",
+                "PORT": 45432,
+            }
         }
-    }
 else:
     DATABASES = {
         "default": {
