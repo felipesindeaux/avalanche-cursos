@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from courses.models import Course
 from courses.serializers import CourseSerializer
 
-from .permissions import IsAdminToDelete
+from .permissions import IsAdminToDelete, IsTeacher
 
 class CreateListCourseView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
@@ -31,3 +31,12 @@ class UpdateListCourseView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+
+class ListTeacherCoursesView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsTeacher]
+
+    serializer_class = CourseSerializer
+
+    def get_queryset(self):    
+        return Course.objects.filter(owner=self.request.user)
