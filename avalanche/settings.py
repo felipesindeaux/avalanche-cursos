@@ -32,7 +32,7 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ["https://avalanche-cursos.herokuapp.com"]
 
-ALLOWED_HOSTS = ["avalanche-cursos.herokuapp.com", "localhost"]
+ALLOWED_HOSTS = ["avalanche-cursos.herokuapp.com", "localhost", "0.0.0.0"]
 
 
 # Application definition

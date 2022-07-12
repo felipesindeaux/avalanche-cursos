@@ -1,6 +1,21 @@
 version: "3.7"
 
 services:
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    stdin_open: true
+    tty: true
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:latest
     env_file: .env
@@ -14,30 +29,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5m
-
-  migration:
-    build: .
-    env_file: .env
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py migrate'
-    volumes:
-      - .:/code
-    depends_on:
-      - db
-
-  web:
-    build: .
-    env_file: .env
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py runserver 0.0.0.0:8000'
-    volumes:
-      - .:/code
-    stdin_open: true
-    tty: true
-    ports:
-      - 8000:8000
-
-    depends_on:
-      - db
-      - migration
-
+     
 volumes:
   pgdata:
