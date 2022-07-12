@@ -20,10 +20,15 @@ services:
     image: postgres:latest
     env_file: .env
     ports:
-      - 45432:5432
+      - 45433:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: psql -U $POSTGRES_USER $POSTGRES_DB || exit 1
       interval: 1s
       timeout: 5s
       retries: 5
       start_period: 5m
+     
+volumes:
+  pgdata:
