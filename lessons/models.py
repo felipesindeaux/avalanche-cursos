@@ -9,4 +9,4 @@ class Lesson(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # course_id uuid [ref: > C.id]
+    course = models.ForeignKey(to="courses.Course", related_name='lessons', on_delete=models.CASCADE)

@@ -4,9 +4,9 @@ from lessons.models import Lesson
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    course_id = serializers.IntegerField(source="course.id", read_only=True)
+
     class Meta:
         model = Lesson
 
-        fields = "__all__"
-
-        read_only_fields = ['id', 'is_active', "created_at", "updated_at"]
+        exclude = ["course"]
