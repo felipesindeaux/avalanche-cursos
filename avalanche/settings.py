@@ -32,7 +32,7 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ["https://avalanche-cursos.herokuapp.com"]
 
-ALLOWED_HOSTS = ["avalanche-cursos.herokuapp.com", "localhost"]
+ALLOWED_HOSTS = ["avalanche-cursos.herokuapp.com", "localhost", "0.0.0.0"]
 
 
 # Application definition
@@ -46,9 +46,10 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = ["rest_framework", "rest_framework.authtoken", "drf_spectacular"]
+THIRD_PARTY_APPS = ["rest_framework",
+                    "rest_framework.authtoken", "drf_spectacular"]
 
-MY_APPS = ["users", "categories", "lessons"]
+MY_APPS = ["users", "categories", "courses", "lessons"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 
@@ -88,15 +89,15 @@ WSGI_APPLICATION = "avalanche.wsgi.application"
 
 if os.getenv("LOCAL"):
     DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.postgresql",
-                "NAME": os.getenv("POSTGRES_DB"),
-                "USER": os.getenv("POSTGRES_USER"),
-                "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-                "HOST": "localhost",
-                "PORT": 45432,
-            }
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": "localhost",
+            "PORT": 45433,
         }
+    }
 else:
     DATABASES = {
         "default": {
@@ -108,7 +109,6 @@ else:
             "PORT": 5432,
         }
     }
-
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
