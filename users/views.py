@@ -9,6 +9,13 @@ from .serializers import (AccountSerializer, LoginSerializer,
                           UpdateAccountSerializer,
                           UpdateStatusAccountSerializer)
 
+class ListUsersView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = AccountSerializer
+
+class RetrieveUserView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = AccountSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
