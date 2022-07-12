@@ -1,9 +1,18 @@
 from django.contrib.auth import authenticate
 from django.shortcuts import render
+from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView, Response, status
 
-from .serializers import LoginSerializer
+from .models import User
+from .serializers import (AccountSerializer, LoginSerializer,
+                          UpdateAccountSerializer,
+                          UpdateStatusAccountSerializer)
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = AccountSerializer
 
 
 class LoginView(APIView):
