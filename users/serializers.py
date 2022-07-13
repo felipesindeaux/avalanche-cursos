@@ -33,7 +33,7 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
             "name",
             "email",
             "is_teacher",
-            "password"
+            "password",
             "is_active"
             ]
         extra_kwargs = {"password": {"write_only": True}}
@@ -51,7 +51,7 @@ class UpdateStatusAccountSerializer(serializers.ModelSerializer):
             "name",
             "email",
             "is_teacher",
-            "password"
+            "password",
             "is_active"
             ]
         read_only_fields = [
