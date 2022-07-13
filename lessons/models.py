@@ -9,4 +9,6 @@ class Lesson(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    course = models.ForeignKey(to="courses.Course", related_name='lessons', on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        to="courses.Course", related_name="lessons", on_delete=models.CASCADE
+    )
