@@ -32,7 +32,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-class UpdateAccountSerializer(serializers.ModelSerializer):
+class UpdateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User

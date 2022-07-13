@@ -5,13 +5,14 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from courses.models import Course
 from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
 
-from .permissions import IsAdminToDelete, IsOwner, IsTeacher
+
+from .permissions import IsAdminToDelete, IsOwner, IsTeacher, IsTeacherOrReadOnly
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly]
 
     serializer_class = CourseSerializer
 
