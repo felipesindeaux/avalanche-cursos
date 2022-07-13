@@ -12,7 +12,7 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = ['id', 'title', 'description', 'price', 'total_hours',
                   'date_published', 'updated_at', 'owner_id', 'categories']
-        read_only_fields = ['is_active', 'updated_at', 'date_published']
+        read_only_fields = ['is_active']
         depth = 1
 
     def create(self, validated_data: dict):
