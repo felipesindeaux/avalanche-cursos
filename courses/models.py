@@ -11,3 +11,4 @@ class Course(models.Model):
     is_active = models.BooleanField(default=True)
 
     owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="courses")
+    categories = models.ManyToManyField("categories.Category", related_name="courses")
