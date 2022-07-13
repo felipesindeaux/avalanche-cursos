@@ -1,12 +1,13 @@
 from categories.models import Category
 from categories.serializers import CategorySerializer
 from rest_framework import serializers
-from users.serializers import AccountSerializer
 
 from .models import Course
 
 
 class CourseSerializer(serializers.ModelSerializer):
+
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Course

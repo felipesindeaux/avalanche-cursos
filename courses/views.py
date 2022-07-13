@@ -1,12 +1,11 @@
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from courses.models import Course
 from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
 
-from .permissions import IsAdminToDelete, IsTeacher, IsOwner
+from .permissions import IsAdminToDelete, IsOwner, IsTeacher
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
