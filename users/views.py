@@ -1,17 +1,15 @@
 from django.contrib.auth import authenticate
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Response, status
 
 from .mixins import SerializerByMethodMixin
 from .models import User
-from .serializers import (AccountSerializer, LoginSerializer,
-                          UpdateAccountSerializer,
-                          UpdateStatusAccountSerializer)
+from .serializers import (LoginSerializer, UpdateUserSerializer,
+                          UpdateUserStatusSerializer, UserSerializer)
 
 
 class ManagementUserView(generics.UpdateAPIView):
@@ -20,7 +18,7 @@ class ManagementUserView(generics.UpdateAPIView):
     permission_classes = [IsAdminUser]
 
     queryset = User.objects.all()
-    serializer_class = UpdateStatusAccountSerializer
+    serializer_class = UpdateUserStatusSerializer
 
     lookup_url_kwarg = 'id'
 
@@ -31,7 +29,7 @@ class ListUsersView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
 
     queryset = User.objects.all()
-    serializer_class = AccountSerializer
+    serializer_class = UserSerializer
 
 
 class RetrieveUpdateUserView(SerializerByMethodMixin, generics.RetrieveUpdateAPIView):
@@ -41,8 +39,8 @@ class RetrieveUpdateUserView(SerializerByMethodMixin, generics.RetrieveUpdateAPI
 
     queryset = User.objects.all()
     serializer_map = {
-        "GET": AccountSerializer,
-        "PATCH": UpdateAccountSerializer,
+        "GET": UserSerializer,
+        "PATCH": UpdateUserSerializer,
     }
 
     def get_object(self):
@@ -57,7 +55,7 @@ class RetrieveUpdateUserView(SerializerByMethodMixin, generics.RetrieveUpdateAPI
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = AccountSerializer
+    serializer_class = UserSerializer
 
 
 class LoginView(APIView):
