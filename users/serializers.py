@@ -3,7 +3,9 @@ from rest_framework import serializers
 from .models import User
 
 
+
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
@@ -29,7 +31,9 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 
-class UpdateUserSerializer(serializers.ModelSerializer):
+
+class UpdateAccountSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
@@ -43,6 +47,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = [
             "is_teacher",
+            "is_active"
         ]
 
 
