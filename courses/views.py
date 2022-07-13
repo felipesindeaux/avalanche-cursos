@@ -7,9 +7,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from courses.models import Course
 from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
 
-from categories.models import Category
-
 from .permissions import IsAdminToDelete, IsTeacher
+
+
 
 class CreateListCourseView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
@@ -25,13 +25,6 @@ class CreateListCourseView(generics.ListCreateAPIView):
 
 
     def perform_create(self, serializer):
-
-        categories = self.request.data.pop("categories")
-
-        for category in categories:
-            cat = Category.objects.get_or_create(category=category)[0]
-            serializer.category.add(cat)
-
         serializer.save(owner=self.request.user)
 
 class UpdateListCourseView(generics.RetrieveUpdateDestroyAPIView):
@@ -40,6 +33,13 @@ class UpdateListCourseView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+
+    def patch(self, request, *args, **kwargs):
+        try:
+            return self.partial_update(request, *args, **kwargs)
+        except KeyError as err:
+            return Response({"message": str(err).replace("'", "")},
+                status.HTTP_422_UNPROCESSABLE_ENTITY,)
 
 class ListTeacherCoursesView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
