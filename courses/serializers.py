@@ -1,21 +1,20 @@
 from categories.models import Category
-
 from categories.serializers import CategorySerializer
-from .models import Course
 from rest_framework import serializers
-
 from users.serializers import AccountSerializer
+
+from .models import Course
+
 
 class CourseSerializer(serializers.ModelSerializer):
 
-    owner = AccountSerializer(read_only=True)
-    categories = CategorySerializer(many=True)
-
     class Meta:
         model = Course
-        fields = "__all__"
-        depth = 2
-    
+        fields = ['id', 'title', 'description', 'price', 'total_hours',
+                  'date_published', 'updated_at', 'owner_id', 'categories']
+        read_only_fields = ['is_active', 'updated_at', 'date_published']
+        depth = 1
+
     def create(self, validated_data: dict):
 
         categories = validated_data.pop("categories")
@@ -24,15 +23,15 @@ class CourseSerializer(serializers.ModelSerializer):
 
         list_categories = []
         for category in categories:
-            cat = Category.objects.get_or_create(**category)[0]    
+            cat = Category.objects.get_or_create(**category)[0]
             list_categories.append(cat)
-        
+
         course.categories.set(list_categories)
 
         return course
 
     def update(self, instance: Course, validated_data: dict):
-        non_editable_keys = ("is_active",)
+
         categories = validated_data.pop("categories", None)
 
         if categories:
@@ -46,8 +45,7 @@ class CourseSerializer(serializers.ModelSerializer):
             instance.categories.set(list_categories)
 
         for key, value in validated_data.items():
-            if key in non_editable_keys:
-                raise KeyError(f"You can not update {key} property.")
+
             setattr(instance, key, value)
 
         instance.save()
@@ -55,22 +53,8 @@ class CourseSerializer(serializers.ModelSerializer):
         return instance
 
 
-    
-
 class UpdateStatusCourseSerializer(serializers.ModelSerializer):
-    owner = AccountSerializer(read_only=True)
-    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Course
-        fields = "__all__"
-        depth = 2
-        read_only_fields = [
-            "title",
-            "description",
-            "price",
-            "total_hours",
-            "date_published",
-            "updated_at",
-            "is_active",
-        ] 
+        fields = ['is_active']
