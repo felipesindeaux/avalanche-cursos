@@ -49,7 +49,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = ["rest_framework",
                     "rest_framework.authtoken", "drf_spectacular"]
 
-MY_APPS = ["users", "categories"]
+MY_APPS = ["users", "categories", "courses", "reviews"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 
@@ -87,17 +87,28 @@ WSGI_APPLICATION = "avalanche.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB"),
-        "USER": os.getenv("POSTGRES_USER"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": "db",
-        "PORT": 5432,
+if os.getenv("LOCAL"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": "localhost",
+            "PORT": 45433,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": "db",
+            "PORT": 5432,
+        }
+    }
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
