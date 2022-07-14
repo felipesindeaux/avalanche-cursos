@@ -24,11 +24,9 @@ class OwnerPermission(BasePermission):
 
         lesson = get_object_or_404(Lesson, pk=lesson_id)
 
-        is_owner = self.course.owner.id == request.user.id
-
         is_lesson_in_course = str(lesson.course_id) == str(self.course.id)
 
-        return is_owner and is_lesson_in_course
+        return is_lesson_in_course
 
 
 class StudentOrAdminReadOnly(BasePermission):
