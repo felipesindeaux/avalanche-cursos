@@ -10,3 +10,14 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
 
         exclude = ["lesson"]
+
+        read_only_fields = ["is_active"]
+
+
+class ToggleTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+
+        fields = ["is_active"]
+
+        read_only_fields = ["is_active"]
