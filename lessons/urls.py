@@ -8,4 +8,11 @@ urlpatterns = [
         "courses/<course_id>/lessons/<pk>/",
         views.RetrieveUpdateDeleteLessonView.as_view(),
     ),
+    path(
+        "courses/<course_id>/lessons/<pk>/activate/", views.ActivateLessonView.as_view()
+    ),
+    path(
+        "courses/<course_id>/lessons/<pk>/deactivate/",
+        views.DeactivateLessonView.as_view(),
+    ),
 ]

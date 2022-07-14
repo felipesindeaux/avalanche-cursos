@@ -1,7 +1,11 @@
 from courses.models import Course
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Lesson
@@ -10,7 +14,7 @@ from .permissions import (
     OwnerAdminStudentReadOnly,
     OwnerCreateUpdatePermission,
 )
-from .serializers import LessonSerializer
+from .serializers import LessonSerializer, ToggleLessonSerializer
 
 
 class ListCreateLessonView(ListCreateAPIView):
@@ -49,3 +53,27 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
             | AdminDeletePermission
         )
     ]
+
+
+class ActivateLessonView(UpdateAPIView):
+    serializer_class = ToggleLessonSerializer
+    queryset = Lesson.objects.all()
+
+    authentication_classes = [TokenAuthentication]
+
+    permission_classes = [IsAuthenticated & OwnerCreateUpdatePermission]
+
+    def perform_update(self, serializer):
+        serializer.save(is_active=True)
+
+
+class DeactivateLessonView(UpdateAPIView):
+    serializer_class = ToggleLessonSerializer
+    queryset = Lesson.objects.all()
+
+    authentication_classes = [TokenAuthentication]
+
+    permission_classes = [IsAuthenticated & OwnerCreateUpdatePermission]
+
+    def perform_update(self, serializer):
+        serializer.save(is_active=False)
