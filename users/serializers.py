@@ -3,7 +3,6 @@ from rest_framework import serializers
 from .models import User
 
 
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -31,7 +30,6 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 
-
 class UpdateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -54,17 +52,5 @@ class UpdateUserStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "id",
-            "name",
-            "email",
-            "is_teacher",
-            "password",
             "is_active"
-        ]
-        read_only_fields = [
-            "id",
-            "name",
-            "email",
-            "is_teacher",
-            "password"
         ]
