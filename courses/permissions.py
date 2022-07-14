@@ -1,7 +1,6 @@
 from rest_framework import permissions
 
 
-
 class IsAdminToDelete(permissions.BasePermission):
     def has_permission(self, request, view):
 
@@ -19,6 +18,7 @@ class IsTeacher(permissions.BasePermission):
 
         return request.user.is_teacher
 
+
 class IsTeacherOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
 
@@ -33,5 +33,12 @@ class IsTeacherOrReadOnly(permissions.BasePermission):
 
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
 
         return request.user == obj.owner
+
+
+class IsStudent(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return not request.user.is_teacher

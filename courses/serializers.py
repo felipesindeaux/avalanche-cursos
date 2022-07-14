@@ -11,12 +11,18 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'price', 'total_hours',
-                  'date_published', 'updated_at', 'owner_id', 'categories']
-        read_only_fields = ['is_active']
-        
-
-       
+        fields = [
+            "id",
+            "title",
+            "description",
+            "price",
+            "total_hours",
+            "date_published",
+            "updated_at",
+            "owner_id",
+            "categories",
+        ]
+        read_only_fields = ["is_active"]
 
     def create(self, validated_data: dict):
 
@@ -57,7 +63,6 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class UpdateStatusCourseSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Course
-        fields = ['is_active']
+        fields = ["is_active"]
