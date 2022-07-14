@@ -82,7 +82,7 @@ class DeactivateCourseView(generics.UpdateAPIView):
         serializer.save(is_active=False)
 
 
-class CompletCoursesView(generics.UpdateAPIView):
+class CompleteCoursesView(generics.UpdateAPIView):
     serializer_class = StudentsSerializer
     queryset = Student.objects.all()
 
