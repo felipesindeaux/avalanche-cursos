@@ -89,8 +89,7 @@ class CompleteCoursesView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    lookup_field = "course__id"
-    lookup_url_kwarg = "course_id"
+    lookup_field = "course_id"
 
     def perform_update(self, serializer):
         serializer.save(is_completed=True)
