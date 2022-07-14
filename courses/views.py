@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from courses.mixins import SerializerByRoleMixin
 
 from courses.models import Course
@@ -14,6 +14,7 @@ from .permissions import (
     IsOwner,
     IsStudent,
     IsTeacherOrReadOnly,
+    StudentHaventCourse,
 )
 
 
@@ -38,7 +39,7 @@ class CreateListCourseView(generics.ListCreateAPIView):
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwner, IsAdminToDelete]
+    permission_classes = [IsAuthenticated, IsOwner, IsAdminToDelete]
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
@@ -47,7 +48,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     serializer_map = {True: CourseSerializer, False: StudentsSerializer}
 
@@ -101,7 +102,7 @@ class BuyCoursesView(generics.CreateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent, StudentHaventCourse]
 
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
