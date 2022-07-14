@@ -32,7 +32,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-class UpdateAccountSerializer(serializers.ModelSerializer):
+class UpdateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
@@ -46,7 +46,6 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = [
             "is_teacher",
-            "is_active"
         ]
 
 
