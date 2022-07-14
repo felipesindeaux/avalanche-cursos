@@ -88,7 +88,7 @@ class CompletCoursesView(generics.UpdateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
 
     def get_object(self, queryset=None):
         return get_object_or_404(

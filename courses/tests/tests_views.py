@@ -53,14 +53,26 @@ class TestCourseViewsByTeacher(APITestCase):
     def test_list_course_created(self):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
-        self.client.post("/api/courses/", data=self.course_data, format="json")
+
+        for _ in range(5):
+            self.client.post("/api/courses/", data=self.course_data, format="json")
 
         response = self.client.get("/api/courses/me/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(5, len(response.data))
 
     def test_buy_course_with_teacher(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        course = self.client.post("/api/courses/", data=self.course_data, format="json")
+
+        response = self.client.post(f"/api/courses/buy/{course.data['id']}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_complete_course_with_teacher(self):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
         course = self.client.post("/api/courses/", data=self.course_data, format="json")
@@ -90,7 +102,6 @@ class TestCourseViewsByStudent(APITestCase):
             email="teste2@mail.com", name="teste", password="123", is_teacher=False
         )
 
-        # cls.token_teacher = Token.objects.create(user=cls.user_teacher)
         cls.token_student = Token.objects.create(user=cls.user_student)
 
         Category.objects.create(name="TEST")
@@ -171,13 +182,11 @@ class TestCourseViewsByStudent(APITestCase):
         self.assertIn("is_completed", response.data)
         self.assertTrue(response.data["is_completed"])
 
-    def test_complete_course(self):
+    def test_complete_course_not_buy(self):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
-        self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         response = self.client.patch(f"/api/courses/complete/{self.course.id}/")
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("is_completed", response.data)
-        self.assertTrue(response.data["is_completed"])
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
