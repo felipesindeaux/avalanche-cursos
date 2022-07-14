@@ -152,6 +152,50 @@ class TestCourseViewsByTeacher(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
 
+    def test_activate_course(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.patch(
+            f"/api/courses/activate/{self.course_deactive.id}/"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_active", response.data)
+        self.assertTrue(response.data["is_active"])
+
+    def test_deactivate_course(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.patch(f"/api/courses/deactivate/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_active", response.data)
+        self.assertFalse(response.data["is_active"])
+
+    def test_activate_course_not_be_owner(self):
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_other_teacher.key
+        )
+
+        response = self.client.patch(f"/api/courses/activate/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_deactivate_course_not_be_owner(self):
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_other_teacher.key
+        )
+
+        response = self.client.patch(f"/api/courses/deactivate/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
 
 class TestCourseViewsByStudent(APITestCase):
     @classmethod

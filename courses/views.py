@@ -64,6 +64,8 @@ class ActivateCourseView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
 
+    lookup_url_kwarg = "course_id"
+
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
@@ -75,6 +77,8 @@ class DeactivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
+
+    # lookup_url_kwarg = "course_id"
 
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
