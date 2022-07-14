@@ -105,4 +105,4 @@ class TestUserView(APITestCase):
             f'/api/users/me/', data=newName)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
-                         'id': self.user.id, 'name': newName['name'], 'email': self.user.email, 'is_teacher': self.user.is_teacher, 'is_active': True})
+                         'id': self.user.id, 'name': newName['name'], 'email': self.user.email, 'is_teacher': self.user.is_teacher})
