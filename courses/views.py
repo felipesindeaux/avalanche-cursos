@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from courses.mixins import SerializerByRoleMixin
 
 from courses.models import Course
-from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
+from courses.serializers import CourseSerializer, RetrieveMyCoursesSerializer, UpdateStatusCourseSerializer
 from students.models import Student
 from students.serializers import StudentsSerializer
 
@@ -49,7 +49,7 @@ class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    serializer_map = {True: CourseSerializer, False: StudentsSerializer}
+    serializer_map = {True: RetrieveMyCoursesSerializer, False: StudentsSerializer}
 
     def get_queryset(self):
         if self.request.user.is_teacher:
