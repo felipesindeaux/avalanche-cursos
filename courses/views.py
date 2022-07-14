@@ -90,8 +90,10 @@ class CompletCoursesView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    lookup_field = "course__id"
-    lookup_url_kwarg = "course_id"
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            Student, course__id=self.kwargs["course_id"], student=self.request.user
+        )
 
     def perform_update(self, serializer):
         serializer.save(is_completed=True)

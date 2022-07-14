@@ -1,4 +1,3 @@
-import json
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.views import status
@@ -61,6 +60,16 @@ class TestCourseViewsByTeacher(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(1, len(response.data))
 
+    def test_buy_course_with_teacher(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        course = self.client.post("/api/courses/", data=self.course_data, format="json")
+
+        response = self.client.post(f"/api/courses/buy/{course.data['id']}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
 
 class TestCourseViewsByStudent(APITestCase):
     @classmethod
@@ -113,3 +122,62 @@ class TestCourseViewsByStudent(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(1, len(response.data))
+
+    def test_list_course_by_id(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.get(f"/api/courses/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("id", response.data)
+
+    def test_list_course_by_invalid_id(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.get(f"/api/courses/INVALID_ID/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+
+    def test_buy_course(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("student", response.data)
+        self.assertFalse(response.data["is_completed"])
+
+    def test_buy_course_duplicated(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        response = self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_complete_course(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        response = self.client.patch(f"/api/courses/complete/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_completed", response.data)
+        self.assertTrue(response.data["is_completed"])
+
+    def test_complete_course(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        response = self.client.patch(f"/api/courses/complete/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_completed", response.data)
+        self.assertTrue(response.data["is_completed"])
