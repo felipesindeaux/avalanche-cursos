@@ -7,7 +7,6 @@ from users.models import User
 
 
 class TestCourseViews(APITestCase):
-
     @classmethod
     def setUpTestData(cls) -> None:
 
@@ -16,23 +15,21 @@ class TestCourseViews(APITestCase):
             "description": "Description",
             "price": 12.22,
             "total_hours": 12,
-            "categories": [{"name": "Node"}]
+            "categories": [{"name": "Node"}],
         }
 
         cls.user = User.objects.create(
-            email="teste@mail.com",
-            name="teste",
-            password="123",
-            is_teacher=True
+            email="teste@mail.com", name="teste", password="123", is_teacher=True
         )
-        
-        cls.token_client = Token.objects.create(user=cls.user)
 
+        cls.token_client = Token.objects.create(user=cls.user)
 
     def test_create_course(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_client.key)
 
-        response = self.client.post("/api/courses/", data=self.course_data, format="json")
+        response = self.client.post(
+            "/api/courses/", data=self.course_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("id", response.data)
         self.assertIn("title", response.data)
@@ -46,6 +43,8 @@ class TestCourseViews(APITestCase):
 
         self.course_data["price"] = 1.222
 
-        response = self.client.post("/api/courses/", data=self.course_data, format="json")
+        response = self.client.post(
+            "/api/courses/", data=self.course_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("price", response.data)

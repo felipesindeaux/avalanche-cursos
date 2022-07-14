@@ -8,7 +8,6 @@ from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
 
 from .permissions import IsAdminToDelete, IsOwner, IsTeacher, IsTeacherOrReadOnly
 
-import ipdb
 
 class CreateListCourseView(generics.ListCreateAPIView):
 
@@ -24,7 +23,7 @@ class CreateListCourseView(generics.ListCreateAPIView):
             return Course.objects.filter(is_active=True)
 
     def perform_create(self, serializer):
-        
+
         serializer.save(owner=self.request.user)
 
 
