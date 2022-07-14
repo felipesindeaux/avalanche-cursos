@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from courses.mixins import SerializerByRoleMixin
 
 from courses.models import Course
@@ -38,7 +38,7 @@ class CreateListCourseView(generics.ListCreateAPIView):
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwner, IsAdminToDelete]
+    permission_classes = [IsAuthenticated, IsOwner, IsAdminToDelete]
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
@@ -47,7 +47,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     serializer_map = {True: CourseSerializer, False: StudentsSerializer}
 
