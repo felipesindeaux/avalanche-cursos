@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Course(models.Model):
 
     title = models.CharField(max_length=50)
@@ -10,5 +11,7 @@ class Course(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="courses")
+    owner = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="courses"
+    )
     categories = models.ManyToManyField("categories.Category", related_name="courses")
