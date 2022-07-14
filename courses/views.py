@@ -1,19 +1,18 @@
 from rest_framework import generics
-from rest_framework.views import Response, status
-
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from courses.models import Course
 from courses.serializers import CourseSerializer, UpdateStatusCourseSerializer
 
-from .permissions import IsAdminToDelete, IsTeacher
 
+from .permissions import IsAdminToDelete, IsOwner, IsTeacher, IsTeacherOrReadOnly
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
+
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly]
 
     serializer_class = CourseSerializer
 
@@ -23,41 +22,47 @@ class CreateListCourseView(generics.ListCreateAPIView):
         else:
             return Course.objects.filter(is_active=True)
 
-
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-class UpdateListCourseView(generics.RetrieveUpdateDestroyAPIView):
+
+class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsAdminToDelete]
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
 
-    def patch(self, request, *args, **kwargs):
-        try:
-            return self.partial_update(request, *args, **kwargs)
-        except KeyError as err:
-            return Response({"message": str(err).replace("'", "")},
-                status.HTTP_422_UNPROCESSABLE_ENTITY,)
 
 class ListTeacherCoursesView(generics.ListAPIView):
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsTeacher]
 
     serializer_class = CourseSerializer
 
-    def get_queryset(self):    
+    def get_queryset(self):
         return Course.objects.filter(owner=self.request.user)
 
+
 class ActivateCourseView(generics.UpdateAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
     def perform_update(self, serializer):
         serializer.save(is_active=True)
 
+
 class DeactivateCourseView(generics.UpdateAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 

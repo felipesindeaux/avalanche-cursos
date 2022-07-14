@@ -1,7 +1,11 @@
 from rest_framework import serializers
+
 from .models import User
 
-class AccountSerializer(serializers.ModelSerializer):
+
+
+class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
@@ -10,7 +14,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "email",
             "is_teacher",
             "password"
-            ]
+        ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -20,12 +24,16 @@ class AccountSerializer(serializers.ModelSerializer):
 
         return User.objects.create_user(**validated_data)
 
+
 class LoginSerializer(serializers.Serializer):
 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-class UpdateAccountSerializer(serializers.ModelSerializer):
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
@@ -35,15 +43,16 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
             "is_teacher",
             "password",
             "is_active"
-            ]
+        ]
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = [
             "is_teacher",
+            "is_active"
         ]
 
 
 # Serializer de ativação/desativação de usuários (somente ADM)
-class UpdateStatusAccountSerializer(serializers.ModelSerializer):
+class UpdateUserStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
@@ -53,7 +62,7 @@ class UpdateStatusAccountSerializer(serializers.ModelSerializer):
             "is_teacher",
             "password",
             "is_active"
-            ]
+        ]
         read_only_fields = [
             "id",
             "name",
