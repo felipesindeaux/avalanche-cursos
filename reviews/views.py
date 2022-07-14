@@ -23,13 +23,13 @@ class GetOrCreateReviewView(MapMathodsMixin, generics.ListCreateAPIView):
     }
 
     def perform_create(self, serializer):
-       course_id = self.kwargs.get("id_course")
+       course_id = self.kwargs.get("course_id")
        course = get_object_or_404(Course, pk=course_id)
        
        serializer.save(user=self.request.user, course=course)
 
     def get_queryset(self):
-        course_id = self.kwargs.get("id_course")
+        course_id = self.kwargs.get("course_id")
         get_object_or_404(Course, pk=course_id)
         return Review.objects.filter(course__id=course_id)
 
