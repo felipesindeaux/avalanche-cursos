@@ -6,6 +6,7 @@ from users.models import User
 
 import ipdb
 
+
 class TestCourseViews(APITestCase):
 
     @classmethod
@@ -25,14 +26,16 @@ class TestCourseViews(APITestCase):
             password="123",
             is_teacher=True
         )
-        
+
         cls.token_client = Token.objects.create(user=cls.user)
 
     def test_create_course(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_client.key)
-        # user = User.objects.get(pk=1)
-        ipdb.set_trace()
-        response = self.client.post("/api/courses/", data=self.course_data)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_client.key
+        )
+        response = self.client.post(
+            "/api/courses/", data=self.course_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("id", response.data)
         self.assertIn("title", response.data)
