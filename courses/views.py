@@ -10,8 +10,8 @@ from students.models import Student
 from students.serializers import StudentsSerializer
 
 from .permissions import (
-    IsAdminToDelete,
     IsOwner,
+    IsOwnerAndAdminToDelete,
     IsStudent,
     IsTeacherOrReadOnly,
     StudentHaventCourse,
@@ -39,7 +39,7 @@ class CreateListCourseView(generics.ListCreateAPIView):
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsOwner, IsAdminToDelete]
+    permission_classes = [IsAuthenticated, IsOwnerAndAdminToDelete]
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()

@@ -7,7 +7,7 @@ from courses.models import Course
 from users.models import User
 
 
-class TestCourseViewsByTeacher(APITestCase):
+class TestCreateCourseViewsByTeacher(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
 
@@ -62,12 +62,47 @@ class TestCourseViewsByTeacher(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(5, len(response.data))
 
+
+class TestCourseViewsByTeacher(APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+
+        cls.course_data = {
+            "title": "Titulo",
+            "description": "Description",
+            "price": 12.22,
+            "total_hours": 12,
+        }
+
+        cls.user_teacher = User.objects.create(
+            email="teste@mail.com", name="teste", password="123", is_teacher=True
+        )
+
+        cls.other_teacher = User.objects.create(
+            email="teste2@mail.com", name="teste", password="123", is_teacher=True
+        )
+
+        cls.token_teacher = Token.objects.create(user=cls.user_teacher)
+        cls.token_other_teacher = Token.objects.create(user=cls.other_teacher)
+
+        Category.objects.create(name="TEST")
+        cls.category = Category.objects.all()
+
+        cls.course = Course.objects.create(**cls.course_data, owner=cls.user_teacher)
+        cls.course.categories.set(cls.category)
+        cls.course.save()
+
+        cls.course_deactive = Course.objects.create(
+            **cls.course_data, is_active=False, owner=cls.user_teacher
+        )
+        cls.course_deactive.categories.set(cls.category)
+        cls.course_deactive.save()
+
     def test_buy_course_with_teacher(self):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
-        course = self.client.post("/api/courses/", data=self.course_data, format="json")
 
-        response = self.client.post(f"/api/courses/buy/{course.data['id']}/")
+        response = self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
@@ -75,9 +110,44 @@ class TestCourseViewsByTeacher(APITestCase):
     def test_complete_course_with_teacher(self):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
-        course = self.client.post("/api/courses/", data=self.course_data, format="json")
 
-        response = self.client.post(f"/api/courses/buy/{course.data['id']}/")
+        response = self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_update_course(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.patch(
+            f"/api/courses/{self.course.id}/", data={"total_hours": 1000}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("total_hours", response.data)
+        self.assertEqual(1000, response.data["total_hours"])
+        self.assertNotEqual(
+            response.data["date_published"], response.data["updated_at"]
+        )
+
+    def test_update_course_not_be_owner(self):
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_other_teacher.key
+        )
+
+        response = self.client.patch(
+            f"/api/courses/{self.course.id}/", data={"total_hours": 1000}, format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_delete_course_with_user_no_adm_permission(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.delete(f"/api/courses/{self.course.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
