@@ -3,7 +3,7 @@ from categories.serializers import CategorySerializer
 from rest_framework import serializers
 
 from .models import Course
-
+import ipdb
 
 class CourseSerializer(serializers.ModelSerializer):
 
@@ -28,7 +28,7 @@ class CourseSerializer(serializers.ModelSerializer):
             list_categories.append(cat)
 
         course.categories.set(list_categories)
-
+        
         return course
 
     def update(self, instance: Course, validated_data: dict):
