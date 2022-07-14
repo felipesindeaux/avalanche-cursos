@@ -1,4 +1,9 @@
 from rest_framework import permissions
+from courses.models import Course
+from students.models import Student
+
+from django.core.exceptions import ObjectDoesNotExist
+from utils.get_object_or_404 import get_object_or_404
 
 
 class IsAdminToDelete(permissions.BasePermission):
@@ -42,3 +47,13 @@ class IsOwner(permissions.BasePermission):
 class IsStudent(permissions.BasePermission):
     def has_permission(self, request, view):
         return not request.user.is_teacher
+
+
+class StudentHaventCourse(permissions.BasePermission):
+    def has_permission(self, request, view):
+        course_id = view.kwargs.get("course_id")
+        course = get_object_or_404(Course, pk=course_id)
+        try:
+            Student.objects.get(course=course, student=request.user)
+        except ObjectDoesNotExist:
+            return True

@@ -14,6 +14,7 @@ from .permissions import (
     IsOwner,
     IsStudent,
     IsTeacherOrReadOnly,
+    StudentHaventCourse,
 )
 
 
@@ -101,7 +102,7 @@ class BuyCoursesView(generics.CreateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent, StudentHaventCourse]
 
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
