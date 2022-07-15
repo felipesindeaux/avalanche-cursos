@@ -3,6 +3,8 @@ from courses.models import Course
 from students.models import Student
 
 from django.core.exceptions import ObjectDoesNotExist
+
+from rest_framework.exceptions import NotAcceptable
 from utils.get_object_or_404 import get_object_or_404
 
 
@@ -57,5 +59,6 @@ class StudentHaventCourse(permissions.BasePermission):
         course = get_object_or_404(Course, pk=course_id)
         try:
             Student.objects.get(course=course, student=request.user)
+            raise NotAcceptable(detail="You have already purchased this course")
         except ObjectDoesNotExist:
             return True
