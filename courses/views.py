@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from students.models import Student
 from students.serializers import StudentsSerializer
+from django.db.models.query import QuerySet
 
 from courses.mixins import SerializerByRoleMixin
 from courses.models import Course
@@ -58,27 +59,27 @@ class ListCoursesView(SerializerByRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
+    serializer_class = StudentsSerializer
     serializer_map = {True: RetrieveMyCoursesSerializer, False: StudentsSerializer}
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         if self.request.user.is_teacher:
 
             return Course.objects.filter(owner=self.request.user)
 
         else:
             router_parameter_gt = self.request.GET.get("completed")
-            print("ola")
+           
 
-        if router_parameter_gt:
+            if router_parameter_gt:
 
-            if router_parameter_gt == "completed":
-                return Student.objects.filter(
-                    student=self.request.user, is_completed=True
-                )
+                if router_parameter_gt == "completed":
+                    return Student.objects.filter(
+                        student=self.request.user, is_completed=True
+                    )
 
-            if router_parameter_gt == "uncompleted":
-                return Student.objects.filter(
+                if router_parameter_gt == "uncompleted":
+                    return Student.objects.filter(
                     student=self.request.user, is_completed=False
                 )
 
