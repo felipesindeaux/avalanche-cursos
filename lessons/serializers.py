@@ -11,6 +11,8 @@ class LessonSerializer(serializers.ModelSerializer):
 
         exclude = ["course"]
 
+        read_only_fields = ["is_active"]
+
 
 class ToggleLessonSerializer(serializers.ModelSerializer):
     class Meta:
