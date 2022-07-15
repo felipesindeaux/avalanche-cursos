@@ -5,6 +5,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Response, status
+from rest_framework.exceptions import NotAcceptable
 
 from .mixins import SerializerByMethodMixin
 from .models import User
@@ -21,6 +22,13 @@ class ManagementUserView(generics.UpdateAPIView):
     serializer_class = UpdateUserStatusSerializer
 
     lookup_url_kwarg = 'id'
+
+    def perform_update(self, serializer):
+        user = get_object_or_404(User, pk=self.kwargs['id'])
+        if self.request.user != user:
+            serializer.save()
+        else:
+            raise NotAcceptable("You cannot deactivate yourself.")
 
 
 class ListUsersView(generics.ListAPIView):
