@@ -1,12 +1,14 @@
 asgiref==3.5.2
 asttokens==2.0.5
 attrs==21.4.0
+autopep8==1.6.0
 backcall==0.2.0
 coverage==6.4.1
 decorator==5.1.1
 dj-database-url==0.5.0
 Django==4.0.6
 django-on-heroku==1.1.2
+django-rest-passwordreset==1.2.1
 djangorestframework==3.13.1
 drf-spectacular==0.22.1
 executing==0.8.3
