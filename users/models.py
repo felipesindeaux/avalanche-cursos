@@ -26,18 +26,20 @@ class User(AbstractUser):
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
     email_message = """
+        Olá {name}, tudo bem?
         Foi recebida uma requisição para troca de senha
         Caso não tenha realiza-a, ignore esta mensagem
 
         O token para trocar sua senha é: {token}
-
-        Primeiro envie seu email mais sua nova senha para /api/users/password_reset/?token={token}
-        Depois envie o token junto a nova senha para /api/users/password_reset/confirm/
-    """.format(token=reset_password_token.key)
+    """.format(name=reset_password_token.user.name, token=reset_password_token.key)
 
     send_mail(
+        # assunto do email
         "Password Reset for Avalanche Cursos",
+        # corpo do email
         email_message,
+        # endereço de email de quem enviará o email (se None, pegará de EMAIL_HOST_USER)
         None,
+        # lista dos endereços de email que receberão o email
         [reset_password_token.user.email]
     )
