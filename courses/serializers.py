@@ -2,12 +2,15 @@ from categories.models import Category
 from categories.serializers import CategorySerializer
 from rest_framework import serializers
 
+from users.serializers import UserNameSerializer
+
 from .models import Course
 
 
 class CourseSerializer(serializers.ModelSerializer):
 
     categories = CategorySerializer(many=True)
+    owner = UserNameSerializer()
 
     class Meta:
         model = Course
@@ -19,10 +22,9 @@ class CourseSerializer(serializers.ModelSerializer):
             "total_hours",
             "date_published",
             "updated_at",
-            "owner_id",
+            "owner",
             "categories",
         ]
-        read_only_fields = ["is_active"]
 
     def create(self, validated_data: dict):
 
@@ -60,6 +62,27 @@ class CourseSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
+
+    categories = CategorySerializer(many=True)
+    owner = UserNameSerializer()
+
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "title",
+            "description",
+            "price",
+            "total_hours",
+            "date_published",
+            "updated_at",
+            "owner",
+            "categories",
+            "lessons"
+        ]
+        depth = 1
 
 
 class UpdateStatusCourseSerializer(serializers.ModelSerializer):
