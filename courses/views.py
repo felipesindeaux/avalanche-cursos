@@ -1,21 +1,18 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from courses.mixins import SerializerByRoleMixin
-
-from courses.models import Course
-from courses.serializers import CourseSerializer, RetrieveMyCoursesSerializer, UpdateStatusCourseSerializer
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from students.models import Student
 from students.serializers import StudentsSerializer
 
-from .permissions import (
-    IsOwner,
-    IsOwnerAndAdminToDelete,
-    IsStudent,
-    IsTeacherOrReadOnly,
-    StudentHaventCourse,
-)
+from courses.mixins import SerializerByRoleMixin
+from courses.models import Course
+from courses.serializers import (CourseSerializer, RetrieveMyCoursesSerializer,
+                                 UpdateStatusCourseSerializer)
+
+from .permissions import (IsOwner, IsOwnerAndAdminToDelete, IsStudent,
+                          IsTeacherOrReadOnly, StudentHaventCourse)
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
@@ -50,7 +47,8 @@ class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    serializer_map = {True: RetrieveMyCoursesSerializer, False: StudentsSerializer}
+    serializer_map = {True: RetrieveMyCoursesSerializer,
+                      False: StudentsSerializer}
 
     def get_queryset(self):
         if self.request.user.is_teacher:
@@ -64,8 +62,6 @@ class ActivateCourseView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
 
-    lookup_url_kwarg = "course_id"
-
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
@@ -78,7 +74,6 @@ class DeactivateCourseView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
 
-
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
@@ -87,31 +82,30 @@ class DeactivateCourseView(generics.UpdateAPIView):
 
 
 class CompleteCoursesView(generics.UpdateAPIView):
+
     serializer_class = StudentsSerializer
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
 
-
     def get_object(self, queryset=None):
         return get_object_or_404(
             Student, course__id=self.kwargs["course_id"], student=self.request.user
         )
-
-    lookup_field = "course_id"
-
 
     def perform_update(self, serializer):
         serializer.save(is_completed=True)
 
 
 class BuyCoursesView(generics.CreateAPIView):
+
     serializer_class = StudentsSerializer
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent, StudentHaventCourse]
+    permission_classes = [IsAuthenticatedOrReadOnly,
+                          IsStudent, StudentHaventCourse]
 
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
