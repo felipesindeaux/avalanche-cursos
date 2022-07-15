@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from .views import (ListUsersView, LoginView, ManagementUserView, RegisterView,
                     RetrieveUpdateUserView)
@@ -8,5 +8,9 @@ urlpatterns = [
     path('register/', RegisterView.as_view()),
     path('users/me/', RetrieveUpdateUserView.as_view()),
     path('users/', ListUsersView.as_view()),
-    path('users/management/<id>/', ManagementUserView.as_view())
+    path('users/management/<id>/', ManagementUserView.as_view()),
+    path(
+        "users/password_reset/",
+        include("django_rest_passwordreset.urls", namespace="password_reset")
+    )
 ]
