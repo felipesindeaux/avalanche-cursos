@@ -68,7 +68,6 @@ class ListCoursesView(SerializerByRoleMixin, generics.ListAPIView):
 
         else:
             router_parameter_gt = self.request.GET.get("completed")
-            print("ola")
 
         if router_parameter_gt:
 
