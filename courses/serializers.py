@@ -10,7 +10,7 @@ from .models import Course
 class CourseSerializer(serializers.ModelSerializer):
 
     categories = CategorySerializer(many=True)
-    owner = UserNameSerializer()
+    owner = UserNameSerializer(read_only=True)
 
     class Meta:
         model = Course
@@ -63,6 +63,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
         return instance
 
+
 class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
 
     categories = CategorySerializer(many=True)
@@ -80,7 +81,7 @@ class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
             "updated_at",
             "owner",
             "categories",
-            "lessons"
+            "lessons",
         ]
         depth = 1
 
