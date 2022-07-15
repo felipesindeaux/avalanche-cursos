@@ -47,8 +47,10 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "rest_framework", "rest_framework.authtoken",
-    "drf_spectacular", 'django_rest_passwordreset'
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_spectacular",
+    "django_rest_passwordreset",
 ]
 
 MY_APPS = [
