@@ -61,6 +61,7 @@ MY_APPS = [
     "reviews",
     "lessons",
     "students_lessons",
+    "tasks",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
