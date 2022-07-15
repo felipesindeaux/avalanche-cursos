@@ -46,10 +46,22 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = ["rest_framework",
-                    "rest_framework.authtoken", "drf_spectacular"]
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_spectacular",
+    "django_rest_passwordreset",
+]
 
-MY_APPS = ["users", "categories", "courses"]
+MY_APPS = [
+    "users",
+    "categories",
+    "courses",
+    "students",
+    "reviews",
+    "lessons",
+    "students_lessons",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 
@@ -170,3 +182,10 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
