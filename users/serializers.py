@@ -1,7 +1,10 @@
 from rest_framework import serializers
+
 from .models import User
 
-class AccountSerializer(serializers.ModelSerializer):
+
+class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
@@ -10,7 +13,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "email",
             "is_teacher",
             "password"
-            ]
+        ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -20,12 +23,33 @@ class AccountSerializer(serializers.ModelSerializer):
 
         return User.objects.create_user(**validated_data)
 
+
+class UserNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "name"
+        ]
+
+class UserIdSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+        ]
+
+
 class LoginSerializer(serializers.Serializer):
 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-class UpdateAccountSerializer(serializers.ModelSerializer):
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
@@ -33,9 +57,8 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
             "name",
             "email",
             "is_teacher",
-            "password"
-            "is_active"
-            ]
+            "password",
+        ]
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = [
             "is_teacher",
@@ -43,21 +66,9 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
 
 
 # Serializer de ativação/desativação de usuários (somente ADM)
-class UpdateStatusAccountSerializer(serializers.ModelSerializer):
+class UpdateUserStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "id",
-            "name",
-            "email",
-            "is_teacher",
-            "password"
             "is_active"
-            ]
-        read_only_fields = [
-            "id",
-            "name",
-            "email",
-            "is_teacher",
-            "password"
         ]

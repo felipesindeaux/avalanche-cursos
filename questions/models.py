@@ -8,4 +8,4 @@ class Question(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="questions")
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="questions")
