@@ -10,8 +10,8 @@ from students.models import Student
 from students.serializers import StudentsSerializer
 
 from .permissions import (
-    IsAdminToDelete,
     IsOwner,
+    IsOwnerAndAdminToDelete,
     IsStudent,
     IsTeacherOrReadOnly,
     StudentHaventCourse,
@@ -39,7 +39,7 @@ class CreateListCourseView(generics.ListCreateAPIView):
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsOwner, IsAdminToDelete]
+    permission_classes = [IsAuthenticated, IsOwnerAndAdminToDelete]
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
@@ -64,6 +64,8 @@ class ActivateCourseView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
 
+    lookup_url_kwarg = "course_id"
+
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
@@ -75,6 +77,7 @@ class DeactivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
+
 
     serializer_class = UpdateStatusCourseSerializer
     queryset = Course.objects.all()
@@ -88,9 +91,16 @@ class CompleteCoursesView(generics.UpdateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
+
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            Student, course__id=self.kwargs["course_id"], student=self.request.user
+        )
 
     lookup_field = "course_id"
+
 
     def perform_update(self, serializer):
         serializer.save(is_completed=True)
