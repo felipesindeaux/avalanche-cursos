@@ -39,7 +39,7 @@ class RetrieveReviewView(MapMathodsMixin, generics.RetrieveUpdateDestroyAPIView)
     permission_classes = [IsAuthenticatedOrReadOnly, IsReviewOwner]
 
     queryset = Review.objects.all()
-
+    serializer_class = ReviewSerializer
     serializer_map = {
         "GET": ReviewListSerializer,
         "POST": ReviewSerializer,
