@@ -6,9 +6,11 @@ from django_rest_passwordreset.signals import reset_password_token_created
 from django.core.mail import send_mail
 
 from users.utils import CustomUserManager
+import uuid
 
 
 class User(AbstractUser):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     name = models.CharField(max_length=127)
     email = models.EmailField(unique=True)
     is_teacher = models.BooleanField()
@@ -19,19 +21,23 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["name"]
 
 
 @receiver(reset_password_token_created)
-def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
+def password_reset_token_created(
+    sender, instance, reset_password_token, *args, **kwargs
+):
     email_message = """
         Olá {name}, tudo bem?
         Foi recebida uma requisição para troca de senha
         Caso não tenha realiza-a, ignore esta mensagem
 
         O token para trocar sua senha é: {token}
-    """.format(name=reset_password_token.user.name, token=reset_password_token.key)
+    """.format(
+        name=reset_password_token.user.name, token=reset_password_token.key
+    )
 
     send_mail(
         # assunto do email
@@ -41,5 +47,5 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         # endereço de email de quem enviará o email (se None, pegará de EMAIL_HOST_USER)
         None,
         # lista dos endereços de email que receberão o email
-        [reset_password_token.user.email]
+        [reset_password_token.user.email],
     )

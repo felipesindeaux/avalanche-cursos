@@ -133,3 +133,7 @@ class BuyCoursesView(generics.CreateAPIView):
                 )
 
         serializer.save(student=self.request.user, course=course)
+
+
+class ListCompletedCoursesView(generics.ListAPIView):
+    ...
