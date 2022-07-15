@@ -54,7 +54,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
 
 
-class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
+class ListCoursesView(SerializerByRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -63,8 +63,25 @@ class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
 
     def get_queryset(self):
         if self.request.user.is_teacher:
+
             return Course.objects.filter(owner=self.request.user)
+
         else:
+            router_parameter_gt = self.request.GET.get("completed")
+            print("ola")
+
+        if router_parameter_gt:
+
+            if router_parameter_gt == "completed":
+                return Student.objects.filter(
+                    student=self.request.user, is_completed=True
+                )
+
+            if router_parameter_gt == "uncompleted":
+                return Student.objects.filter(
+                    student=self.request.user, is_completed=False
+                )
+
             return Student.objects.filter(student=self.request.user)
 
 
@@ -133,7 +150,3 @@ class BuyCoursesView(generics.CreateAPIView):
                 )
 
         serializer.save(student=self.request.user, course=course)
-
-
-class ListCompletedCoursesView(generics.ListAPIView):
-    ...
