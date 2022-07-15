@@ -1,8 +1,9 @@
 from django.db import models
+import uuid
 
 
 class StudentLessons(models.Model):
-
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     is_completed = models.BooleanField(default=False)
 
     course = models.ForeignKey(
