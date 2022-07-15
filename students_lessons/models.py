@@ -12,5 +12,5 @@ class StudentLessons(models.Model):
         "users.User", on_delete=models.CASCADE, related_name="students_lesson"
     )
     lesson = models.ForeignKey(
-        "lessosns.Lesson", on_delete=models.CASCADE, related_name="students"
+        "lessons.Lesson", on_delete=models.CASCADE, related_name="students"
     )
