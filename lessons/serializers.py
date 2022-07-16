@@ -4,12 +4,14 @@ from lessons.models import Lesson
 
 
 class LessonSerializer(serializers.ModelSerializer):
-    course_id = serializers.IntegerField(source="course.id", read_only=True)
+    course_id = serializers.UUIDField(source="course.id", read_only=True)
 
     class Meta:
         model = Lesson
 
         exclude = ["course"]
+
+        read_only_fields = ["is_active"]
 
 
 class ToggleLessonSerializer(serializers.ModelSerializer):

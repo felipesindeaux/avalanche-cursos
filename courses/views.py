@@ -1,21 +1,23 @@
+from urllib import request
+
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
+from lessons.models import Lesson
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from courses.mixins import SerializerByRoleMixin
-
-from courses.models import Course
-from courses.serializers import CourseSerializer, RetrieveMyCoursesSerializer, UpdateStatusCourseSerializer
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from students.models import Student
 from students.serializers import StudentsSerializer
+from students_lessons.serializers import StudentsLessonsSerializer
 
-from .permissions import (
-    IsAdminToDelete,
-    IsOwner,
-    IsStudent,
-    IsTeacherOrReadOnly,
-    StudentHaventCourse,
-)
+from courses.mixins import SerializerByMethodMixin
+from courses.models import Course
+from courses.serializers import (CourseSerializer, RetrieveMyCoursesSerializer,
+                                 UpdateStatusCourseSerializer)
+
+from .permissions import (IsOwner, IsOwnerAndAdminToDelete, IsStudent,
+                          IsTeacherOrReadOnly, StudentHaventCourse)
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
@@ -39,23 +41,40 @@ class CreateListCourseView(generics.ListCreateAPIView):
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsOwner, IsAdminToDelete]
+    permission_classes = [IsAuthenticated, IsOwnerAndAdminToDelete]
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
 
 
-class ListTeacherCoursesView(SerializerByRoleMixin, generics.ListAPIView):
+class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = RetrieveMyCoursesSerializer
+    serializer_map = {'Teacher': RetrieveMyCoursesSerializer,
+                      'Student': StudentsSerializer}
 
-    serializer_map = {True: RetrieveMyCoursesSerializer, False: StudentsSerializer}
-
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         if self.request.user.is_teacher:
+
             return Course.objects.filter(owner=self.request.user)
+
         else:
+            router_parameter_gt = self.request.GET.get("completed")
+
+            if router_parameter_gt:
+
+                if router_parameter_gt == "completed":
+                    return Student.objects.filter(
+                        student=self.request.user, is_completed=True
+                    )
+
+                if router_parameter_gt == "uncompleted":
+                    return Student.objects.filter(
+                        student=self.request.user, is_completed=False
+                    )
+
             return Student.objects.filter(student=self.request.user)
 
 
@@ -84,25 +103,44 @@ class DeactivateCourseView(generics.UpdateAPIView):
 
 
 class CompleteCoursesView(generics.UpdateAPIView):
+
     serializer_class = StudentsSerializer
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
 
-    lookup_field = "course_id"
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            Student,
+            course__id=self.kwargs["course_id"],
+            student=self.request.user,
+        )
 
     def perform_update(self, serializer):
         serializer.save(is_completed=True)
 
 
 class BuyCoursesView(generics.CreateAPIView):
+
     serializer_class = StudentsSerializer
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent, StudentHaventCourse]
+    permission_classes = [IsAuthenticatedOrReadOnly,
+                          IsStudent, StudentHaventCourse]
 
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
+
+        lessons = Lesson.objects.filter(course=course)
+        if len(lessons) > 0:
+            for lesson in lessons:
+                serializer_lesson = StudentsLessonsSerializer(data={})
+                serializer_lesson.is_valid(raise_exception=True)
+
+                serializer_lesson.save(
+                    student=self.request.user, course=course, lesson=lesson
+                )
+
         serializer.save(student=self.request.user, course=course)

@@ -5,6 +5,7 @@ omit =
     avalanche/*
     manage.py
     utils/*
+    */tests/*
 
 [report]
 show_missing = True
