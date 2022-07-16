@@ -17,7 +17,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         data = super(AnswerSerializer, self).to_representation(instance)
         data = {
             "id": data["id"],
-            "answer": data["answer"],
+            "content": data["content"],
             "date_published": data["date_published"],
             "updated_at": data["updated_at"],
             "question_id": data["question"]["id"],
@@ -38,7 +38,7 @@ class AnswerSerializerDetail(serializers.ModelSerializer):
         data = super(AnswerSerializerDetail, self).to_representation(instance)
         data = {
             "id": data["id"],
-            "answer": data["answer"],
+            "content": data["content"],
             "date_published": data["date_published"],
             "updated_at": data["updated_at"],
             "question": data["question"],
