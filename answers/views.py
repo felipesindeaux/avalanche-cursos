@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from answers.permissions import IsOwnerAndAdminToDelete
 
 from questions.models import Question
 from .models import Answer
@@ -27,19 +28,16 @@ class ListCreateAnswerView(generics.ListCreateAPIView):
         return Answer.objects.filter(question_id=question_id)
 
 
-class ListAnswerView(generics.ListAPIView):
+class RetrieveUpdateDestroyAnswerView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerAndAdminToDelete]
 
     serializer_class = AnswerSerializerDetail
     queryset = Answer.objects.all()
 
-    def get_queryset(self):
-        question_id = self.kwargs.get("question_id")
-        get_object_or_404(Question, pk=question_id)
+    lookup_url_kwarg = "answer_id"
 
-        answer_id = self.kwargs.get("answer_id")
-        get_object_or_404(Answer, pk=answer_id)
+    
 
-        return Answer.objects.filter(question_id=question_id, id=answer_id)
+
 

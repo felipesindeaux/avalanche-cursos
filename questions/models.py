@@ -11,3 +11,5 @@ class Question(models.Model):
     is_active = models.BooleanField(default=True)
 
     user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="questions")
+
+    categories = models.ManyToManyField("categories.Category", related_name="questions")
