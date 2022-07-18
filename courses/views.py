@@ -4,7 +4,7 @@ from lessons.models import Lesson
 from courses.models import Course
 from students.models import Student
 
-from courses.mixins import SerializerByMethodMixin
+from courses.mixins import SerializerByMethodMixin, SerializerByUserRoleMixin
 
 from students.serializers import StudentsSerializer
 from students_lessons.serializers import StudentsLessonsSerializer
@@ -29,12 +29,13 @@ from .permissions import (
 )
 
 
-class CreateListCourseView(generics.ListCreateAPIView):
+class CreateListCourseView(SerializerByMethodMixin, generics.ListCreateAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly]
 
     serializer_class = CourseSerializer
+    serializer_map = {"POST": CourseSerializer, "GET": RetrieveMyCoursesSerializer}
 
     def get_queryset(self):
 
@@ -61,16 +62,20 @@ class CreateListCourseView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class RetrieveUpdateDestroyView(
+    SerializerByMethodMixin, generics.RetrieveUpdateDestroyAPIView
+):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerAndAdminToDelete]
 
     serializer_class = CourseSerializer
+    serializer_map = {"UPDATE": CourseSerializer, "GET": RetrieveMyCoursesSerializer}
+
     queryset = Course.objects.all()
 
 
-class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
+class ListCoursesView(SerializerByUserRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

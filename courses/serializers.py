@@ -1,6 +1,7 @@
 from categories.models import Category
 from categories.serializers import CategorySerializer
 from rest_framework import serializers
+from lessons.models import Lesson
 
 from users.serializers import UserNameSerializer
 
@@ -14,17 +15,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = [
-            "id",
-            "title",
-            "description",
-            "price",
-            "total_hours",
-            "date_published",
-            "updated_at",
-            "owner",
-            "categories",
-        ]
+        fields = "__all__"
 
     def create(self, validated_data: dict):
 
@@ -63,27 +54,37 @@ class CourseSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return {
+            **data,
+            "categories": map(lambda data: data["name"], data["categories"]),
+        }
+
 
 class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
 
     categories = CategorySerializer(many=True)
     owner = UserNameSerializer()
+    lessons_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
-        fields = [
-            "id",
-            "title",
-            "description",
-            "price",
-            "total_hours",
-            "date_published",
-            "updated_at",
-            "owner",
-            "categories",
-            "lessons",
-        ]
-        depth = 1
+        fields = "__all__"
+        depth = 2
+
+    def get_lessons_count(self, course: Course):
+        return Lesson.objects.filter(course__id=course.id).count()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return {
+            **data,
+            "categories": map(
+                lambda data: data["name"],
+                data["categories"],
+            ),
+        }
 
 
 class UpdateStatusCourseSerializer(serializers.ModelSerializer):
