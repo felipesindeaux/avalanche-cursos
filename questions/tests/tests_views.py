@@ -62,13 +62,13 @@ class AnswerTestView(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
-        for _ in range(10):
-            self.client.post("/api/questions/", data=self.question_data, format="json")
+        
+        self.client.post("/api/questions/", data=self.question_data, format="json")
 
-        response = self.client.get("/api/questions/")
+        response = self.client.get("/api/questions/?page=1")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(10, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
     def test_list_question_created_by_id(self):
 
@@ -121,13 +121,11 @@ class AnswerTestView(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
 
         response = self.client.patch(
-            f"/api/courses/{question.data['id']}/", data={"title": "boa tarde"}, format="json"
+            f"/api/questions/{question.data['id']}/", data={"title": "boa tarde"}, format="json"
         )
 
-        print(response.data)
-
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        # self.assertIn("detail", response.data)
+        self.assertIn("detail", response.data)
 
     def test_delete_question_be_onwer(self):
 

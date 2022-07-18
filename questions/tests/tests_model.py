@@ -5,7 +5,7 @@ from questions.models import Question
 from datetime import datetime as dt
 
 
-class AnswerTest(TestCase):
+class QuestionTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(
