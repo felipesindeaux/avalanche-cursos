@@ -1,5 +1,4 @@
 from courses.models import Course
-from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import ParseError, PermissionDenied
 from rest_framework.generics import (
@@ -9,6 +8,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
+from utils import get_object_or_404, validate_uuid
 
 from .models import Lesson
 from .serializers import LessonSerializer, ToggleLessonSerializer
@@ -29,7 +29,9 @@ class ListCreateLessonView(ListCreateAPIView):
             )
 
     def perform_create(self, serializer):
-        course = get_object_or_404(Course, pk=self.kwargs["course_id"])
+        uuid = validate_uuid(self.kwargs["course_id"])
+
+        course = get_object_or_404(Course, "Course not found", id=uuid)
 
         owner_id = course.owner.id
         authenticated_user_id = self.request.user.id
@@ -50,15 +52,10 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         lesson = self.get_object()
 
-        course_id = str(lesson.course.id)
-        course_id_param = self.kwargs["course_id"]
-
-        if course_id != course_id_param:
-            raise ParseError("Course does not own this lesson")
-
         owner_id = lesson.course.owner.id
         authenticated_user = self.request.user
-        students = lesson.students.filter(student_id=authenticated_user.id)
+
+        students = lesson.students_lessons.filter(student__student=authenticated_user)
 
         is_student = len(students) > 0
         is_owner = owner_id == authenticated_user.id
@@ -74,12 +71,6 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         lesson = self.get_object()
 
-        course_id = str(lesson.course.id)
-        course_id_param = self.kwargs["course_id"]
-
-        if course_id != course_id_param:
-            raise ParseError("Course does not own this lesson")
-
         owner_id = lesson.course.owner.id
         authenticated_user_id = self.request.user.id
 
@@ -89,14 +80,6 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         serializer.save()
 
     def perform_destroy(self, instance):
-        lesson = self.get_object()
-
-        course_id = str(lesson.course.id)
-        course_id_param = self.kwargs["course_id"]
-
-        if course_id != course_id_param:
-            raise ParseError("Course does not own this lesson")
-
         is_superuser = self.request.user.is_superuser
 
         if not is_superuser:
@@ -115,12 +98,6 @@ class ActivateLessonView(UpdateAPIView):
 
     def perform_update(self, serializer):
         lesson = self.get_object()
-
-        course_id = str(lesson.course.id)
-        course_id_param = self.kwargs["course_id"]
-
-        if course_id != course_id_param:
-            raise ParseError("Course does not own this lesson")
 
         authenticated_user_id = self.request.user.id
         owner_id = lesson.course.owner.id
@@ -141,12 +118,6 @@ class DeactivateLessonView(UpdateAPIView):
 
     def perform_update(self, serializer):
         lesson = self.get_object()
-
-        course_id = str(lesson.course.id)
-        course_id_param = self.kwargs["course_id"]
-
-        if course_id != course_id_param:
-            raise ParseError("Course does not own this lesson")
 
         authenticated_user_id = self.request.user.id
         owner_id = lesson.course.owner.id
