@@ -32,7 +32,7 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ["https://avalanche-cursos.herokuapp.com"]
 
-ALLOWED_HOSTS = ["avalanche-cursos.herokuapp.com", "localhost", "0.0.0.0"]
+ALLOWED_HOSTS = ["avalanche-cursos.herokuapp.com", "localhost", "0.0.0.0", "127.0.0.1"]
 
 
 # Application definition
@@ -62,6 +62,8 @@ MY_APPS = [
     "lessons",
     "students_lessons",
     "tasks",
+    "questions",
+    "answers",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
