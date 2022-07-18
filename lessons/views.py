@@ -8,6 +8,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
+from students_lessons.models import StudentLessons
 from utils import get_object_or_404, validate_uuid
 
 from .models import Lesson
@@ -39,7 +40,15 @@ class ListCreateLessonView(ListCreateAPIView):
         if owner_id != authenticated_user_id:
             raise PermissionDenied("You must be the course owner to create a lesson")
 
-        serializer.save(course=course)
+        lesson = serializer.save(course=course)
+
+        if len(course.students.all()):
+            lesson_students = [
+                StudentLessons(student=student, lesson=lesson)
+                for student in course.students.all()
+            ]
+
+            StudentLessons.objects.bulk_create(lesson_students)
 
 
 class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
