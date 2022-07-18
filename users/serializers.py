@@ -33,6 +33,14 @@ class UserNameSerializer(serializers.ModelSerializer):
             "name"
         ]
 
+class UserIdSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+        ]
+
 
 class LoginSerializer(serializers.Serializer):
 

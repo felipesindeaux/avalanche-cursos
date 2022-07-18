@@ -1,4 +1,3 @@
-from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from lessons.models import Lesson
 from rest_framework import generics
@@ -7,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from students.models import Student
 from students.serializers import StudentsSerializer
 from students_lessons.models import StudentLessons
+from utils.get_object_or_404 import get_object_or_404
 
 from courses.mixins import SerializerByMethodMixin
 from courses.models import Course
@@ -33,10 +33,24 @@ class CreateListCourseView(generics.ListCreateAPIView):
     serializer_class = CourseSerializer
 
     def get_queryset(self):
+
+        router_parameter = self.request.GET.get("category")
+
+        if router_parameter:
+
+            if self.request.user.is_superuser:
+                return Course.objects.filter(
+                    categories__name__contains=router_parameter
+                )
+
+            return Course.objects.filter(
+                categories__name__contains=router_parameter, is_active=True
+            )
+
         if self.request.user.is_superuser:
             return Course.objects.all()
-        else:
-            return Course.objects.filter(is_active=True)
+
+        return Course.objects.filter(is_active=True)
 
     def perform_create(self, serializer):
 
@@ -62,7 +76,7 @@ class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
         "Student": StudentsSerializer,
     }
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self):
         if self.request.user.is_teacher:
             router_parameter_gt = self.request.GET.get("active")
 
@@ -133,6 +147,7 @@ class CompleteCoursesView(generics.UpdateAPIView):
     def get_object(self, queryset=None):
         return get_object_or_404(
             Student,
+            detail="Your not bought this course",
             course__id=self.kwargs["course_id"],
             student=self.request.user,
         )

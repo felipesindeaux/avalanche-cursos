@@ -31,12 +31,13 @@ def password_reset_token_created(
 ):
     email_message = """
         Olá {name}, tudo bem?
-        Foi recebida uma requisição para troca de senha
-        Caso não tenha realiza-a, ignore esta mensagem
+        
+        Foi recebida uma requisição para troca de senha da sua conta
+        Caso não tenha realizado-a, ignore esta mensagem
 
         O token para trocar sua senha é: {token}
     """.format(
-        name=reset_password_token.user.name, token=reset_password_token.key
+        name=reset_password_token.user.name.title(), token=reset_password_token.key
     )
 
     send_mail(
