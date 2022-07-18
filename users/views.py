@@ -46,6 +46,7 @@ class RetrieveUpdateUserView(SerializerByMethodMixin, generics.RetrieveUpdateAPI
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
+    serializer_class = UserSerializer
     serializer_map = {
         "GET": UserSerializer,
         "PATCH": UpdateUserSerializer,
@@ -67,6 +68,8 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LoginView(APIView):
+    queryset = User.objects.all()
+    serializer_class = LoginSerializer
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 

@@ -7,21 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import NotAcceptable
 from utils.get_object_or_404 import get_object_or_404
 
-
-class IsTeacher(permissions.BasePermission):
-    def has_permission(self, request, view):
-
-        if request.user.is_superuser:
-            return True
-
-        return request.user.is_teacher
-
-
 class IsTeacherOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-
-        if request.user.is_superuser:
-            return True
 
         if request.method in permissions.SAFE_METHODS:
             return True
