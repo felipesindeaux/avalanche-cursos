@@ -171,14 +171,12 @@ class BuyCoursesView(generics.CreateAPIView):
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
 
+        student_courses = serializer.save(student=self.request.user, course=course)
+
         lessons = Lesson.objects.filter(course=course)
         if len(lessons) > 0:
             for lesson in lessons:
                 serializer_lesson = StudentsLessonsSerializer(data={})
                 serializer_lesson.is_valid(raise_exception=True)
 
-                serializer_lesson.save(
-                    student=self.request.user, course=course, lesson=lesson
-                )
-
-        serializer.save(student=self.request.user, course=course)
+                serializer_lesson.save(student=student_courses, lesson=lesson)

@@ -1,5 +1,6 @@
-from django.db import models
 import uuid
+
+from django.db import models
 
 
 class Student(models.Model):
@@ -9,5 +10,5 @@ class Student(models.Model):
         "courses.Course", on_delete=models.CASCADE, related_name="students"
     )
     student = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="students"
+        "users.User", on_delete=models.CASCADE, related_name="students_courses"
     )

@@ -1,18 +1,15 @@
 from os import read
-from rest_framework import serializers
 
-
-from courses.serializers import RetrieveMyCoursesSerializer
-from users.serializers import UserSerializer
 from lessons.serializers import LessonSerializer
+from rest_framework import serializers
+from students.serializers import StudentsSerializer
 
 from .models import StudentLessons
 
 
 class StudentsLessonsSerializer(serializers.ModelSerializer):
 
-    course = RetrieveMyCoursesSerializer(read_only=True)
-    student = UserSerializer(read_only=True)
+    student = StudentsSerializer(read_only=True)
     lesson = LessonSerializer(read_only=True)
 
     class Meta:
