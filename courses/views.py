@@ -5,19 +5,26 @@ from django.shortcuts import get_object_or_404
 from lessons.models import Lesson
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from students.models import Student
 from students.serializers import StudentsSerializer
 from students_lessons.serializers import StudentsLessonsSerializer
 
 from courses.mixins import SerializerByMethodMixin
 from courses.models import Course
-from courses.serializers import (CourseSerializer, RetrieveMyCoursesSerializer,
-                                 UpdateStatusCourseSerializer)
+from courses.serializers import (
+    CourseSerializer,
+    RetrieveMyCoursesSerializer,
+    UpdateStatusCourseSerializer,
+)
 
-from .permissions import (IsOwner, IsOwnerAndAdminToDelete, IsStudent,
-                          IsTeacherOrReadOnly, StudentHaventCourse)
+from .permissions import (
+    IsOwner,
+    IsOwnerAndAdminToDelete,
+    IsStudent,
+    IsTeacherOrReadOnly,
+    StudentHaventCourse,
+)
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
@@ -52,11 +59,26 @@ class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = RetrieveMyCoursesSerializer
-    serializer_map = {'Teacher': RetrieveMyCoursesSerializer,
-                      'Student': StudentsSerializer}
+    serializer_map = {
+        "Teacher": RetrieveMyCoursesSerializer,
+        "Student": StudentsSerializer,
+    }
 
     def get_queryset(self) -> QuerySet:
         if self.request.user.is_teacher:
+            router_parameter_gt = self.request.GET.get("active")
+
+            if router_parameter_gt:
+
+                if router_parameter_gt == "true":
+                    return Course.objects.filter(
+                        owner=self.request.user, is_active=True
+                    )
+
+                if router_parameter_gt == "false":
+                    return Course.objects.filter(
+                        owner=self.request.user, is_active=False
+                    )
 
             return Course.objects.filter(owner=self.request.user)
 
@@ -127,8 +149,7 @@ class BuyCoursesView(generics.CreateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly,
-                          IsStudent, StudentHaventCourse]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent, StudentHaventCourse]
 
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
