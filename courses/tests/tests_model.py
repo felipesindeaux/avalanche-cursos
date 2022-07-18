@@ -11,12 +11,12 @@ class CourseTest(TestCase):
     @classmethod
     def setUpTestData(cls):
 
-        User.objects.create(
+        cls.user_data = User.objects.create(
             email="teste@mail.com", name="teste", password="123", is_teacher=True
         )
         Category.objects.create(name="TEST")
 
-        cls.user = User.objects.get(pk=1)
+        cls.user = User.objects.get(pk=cls.user_data.id)
         cls.category = Category.objects.all()
 
         cls.course_data = {

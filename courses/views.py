@@ -1,20 +1,24 @@
-from urllib import request
-from students_lessons.serializers import StudentsLessonsSerializer
-from django.shortcuts import get_object_or_404
-from rest_framework import generics
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from students.models import Student
-from students.serializers import StudentsSerializer
+from utils.get_object_or_404 import get_object_or_404
 
-from courses.mixins import SerializerByRoleMixin
-from courses.models import Course
 from lessons.models import Lesson
+from courses.models import Course
+from students.models import Student
+
+from courses.mixins import SerializerByMethodMixin
+
+from students.serializers import StudentsSerializer
+from students_lessons.serializers import StudentsLessonsSerializer
 from courses.serializers import (
     CourseSerializer,
     RetrieveMyCoursesSerializer,
     UpdateStatusCourseSerializer,
 )
+
+from rest_framework import generics
+
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+
 
 from .permissions import (
     IsOwner,
@@ -23,8 +27,6 @@ from .permissions import (
     IsTeacherOrReadOnly,
     StudentHaventCourse,
 )
-
-from rest_framework.views import Response, status
 
 
 class CreateListCourseView(generics.ListCreateAPIView):
@@ -35,10 +37,24 @@ class CreateListCourseView(generics.ListCreateAPIView):
     serializer_class = CourseSerializer
 
     def get_queryset(self):
+
+        router_parameter = self.request.GET.get("category")
+
+        if router_parameter:
+
+            if self.request.user.is_superuser:
+                return Course.objects.filter(
+                    categories__name__contains=router_parameter
+                )
+
+            return Course.objects.filter(
+                categories__name__contains=router_parameter, is_active=True
+            )
+
         if self.request.user.is_superuser:
             return Course.objects.all()
-        else:
-            return Course.objects.filter(is_active=True)
+
+        return Course.objects.filter(is_active=True)
 
     def perform_create(self, serializer):
 
@@ -54,33 +70,48 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
 
 
-class ListCoursesView(SerializerByRoleMixin, generics.ListAPIView):
+class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
-    serializer_map = {True: RetrieveMyCoursesSerializer, False: StudentsSerializer}
+    serializer_class = RetrieveMyCoursesSerializer
+    serializer_map = {
+        "Teacher": RetrieveMyCoursesSerializer,
+        "Student": StudentsSerializer,
+    }
 
     def get_queryset(self):
         if self.request.user.is_teacher:
+            router_parameter_gt = self.request.GET.get("active")
+
+            if router_parameter_gt:
+
+                if router_parameter_gt == "true":
+                    return Course.objects.filter(
+                        owner=self.request.user, is_active=True
+                    )
+
+                if router_parameter_gt == "false":
+                    return Course.objects.filter(
+                        owner=self.request.user, is_active=False
+                    )
 
             return Course.objects.filter(owner=self.request.user)
 
         else:
             router_parameter_gt = self.request.GET.get("completed")
-            print("ola")
 
-        if router_parameter_gt:
+            if router_parameter_gt:
 
-            if router_parameter_gt == "completed":
-                return Student.objects.filter(
-                    student=self.request.user, is_completed=True
-                )
+                if router_parameter_gt == "completed":
+                    return Student.objects.filter(
+                        student=self.request.user, is_completed=True
+                    )
 
-            if router_parameter_gt == "uncompleted":
-                return Student.objects.filter(
-                    student=self.request.user, is_completed=False
-                )
+                if router_parameter_gt == "uncompleted":
+                    return Student.objects.filter(
+                        student=self.request.user, is_completed=False
+                    )
 
             return Student.objects.filter(student=self.request.user)
 
@@ -120,6 +151,7 @@ class CompleteCoursesView(generics.UpdateAPIView):
     def get_object(self, queryset=None):
         return get_object_or_404(
             Student,
+            detail="Your not bought this course",
             course__id=self.kwargs["course_id"],
             student=self.request.user,
         )
@@ -139,14 +171,12 @@ class BuyCoursesView(generics.CreateAPIView):
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])
 
+        student_courses = serializer.save(student=self.request.user, course=course)
+
         lessons = Lesson.objects.filter(course=course)
         if len(lessons) > 0:
             for lesson in lessons:
                 serializer_lesson = StudentsLessonsSerializer(data={})
                 serializer_lesson.is_valid(raise_exception=True)
 
-                serializer_lesson.save(
-                    student=self.request.user, course=course, lesson=lesson
-                )
-
-        serializer.save(student=self.request.user, course=course)
+                serializer_lesson.save(student=student_courses, lesson=lesson)
