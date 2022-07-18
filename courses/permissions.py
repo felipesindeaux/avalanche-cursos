@@ -1,11 +1,11 @@
-from rest_framework import permissions
-from courses.models import Course
-from students.models import Student
-
 from django.core.exceptions import ObjectDoesNotExist
-
+from rest_framework import permissions
 from rest_framework.exceptions import NotAcceptable
+from students.models import Student
 from utils.get_object_or_404 import get_object_or_404
+
+from courses.models import Course
+
 
 class IsTeacherOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -42,6 +42,9 @@ class IsStudent(permissions.BasePermission):
 
 class StudentHaventCourse(permissions.BasePermission):
     def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return False
+
         course_id = view.kwargs.get("course_id")
         course = get_object_or_404(Course, pk=course_id)
         try:

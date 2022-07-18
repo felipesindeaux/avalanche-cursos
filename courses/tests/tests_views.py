@@ -326,21 +326,11 @@ class TestBuyCoursesViews(APITestCase):
 
         response = self.client.post(f"/api/courses/buy/{self.course.id}/")
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn("id", response.data)
-        self.assertEqual(str(self.course.id), response.data["course"]["id"])
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_buy_course_duplicated_with_student(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
-        self.client.post(f"/api/courses/buy/{self.course.id}/")
-
-        response = self.client.post(f"/api/courses/buy/{self.course.id}/")
-
-        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
-        self.assertIn("detail", response.data)
-
-    def test_buy_course_duplicated_with_admin(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
         self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         response = self.client.post(f"/api/courses/buy/{self.course.id}/")
@@ -485,16 +475,6 @@ class TestUpdatedCoursesViews(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn("detail", response.data)
-
-    def test_complete_course_with_admin(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
-        self.client.post(f"/api/courses/buy/{self.course.id}/")
-
-        response = self.client.patch(f"/api/courses/complete/{self.course.id}/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("is_completed", response.data)
-        self.assertTrue(response.data["is_completed"])
 
     def test_complete_course_not_bought_with_admin(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
