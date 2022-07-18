@@ -57,11 +57,11 @@ class TestCreateLesson(APITestCase):
     def setUpTestData(cls) -> None:
         admin = User.objects.create_superuser(**ADMIN_DATA)
         teacher = User.objects.create_user(**TEACHER_DATA_1)
-        student = User.objects.create_user(**STUDENT_DATA)
+        cls.student = User.objects.create_user(**STUDENT_DATA)
 
         cls.admin_token = Token.objects.create(user=admin)
         cls.teacher_token = Token.objects.create(user=teacher)
-        cls.student_token = Token.objects.create(user=student)
+        cls.student_token = Token.objects.create(user=cls.student)
 
         cls.course = Course.objects.create(owner=teacher, **COURSE_DATA)
 
@@ -135,6 +135,19 @@ class TestCreateLesson(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual("required", response.data["title"][0].code)
         self.assertEqual("required", response.data["description"][0].code)
+
+    def test_create_lesson_affect_student_lessons_table(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+
+        response = self.client.post(
+            f"/api/courses/{self.course.id}/lessons/",
+            data=LESSON_DATA,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
 class TestListLesson(APITestCase):
