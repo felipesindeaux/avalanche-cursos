@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from lessons.models import Lesson
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import (
@@ -7,6 +6,7 @@ from rest_framework.generics import (
     UpdateAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from utils import get_object_or_404, validate_uuid
 
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, ToggleTaskSerializer
@@ -27,7 +27,9 @@ class ListCreateTaskView(ListCreateAPIView):
             )
 
     def perform_create(self, serializer):
-        lesson = get_object_or_404(Lesson, pk=self.kwargs["lesson_id"])
+        uuid = validate_uuid(self.kwargs["lesson_id"])
+
+        lesson = get_object_or_404(Lesson, "Lesson not found", id=uuid)
 
         serializer.save(lesson=lesson)
 
