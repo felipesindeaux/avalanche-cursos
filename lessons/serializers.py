@@ -13,6 +13,14 @@ class LessonSerializer(serializers.ModelSerializer):
 
         read_only_fields = ["is_active"]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        video = data.pop("video")
+        if video:
+            video_url_formatted = video[0:video.index("?")]
+            return {**data, "video_url": video_url_formatted}
+        return data
+
 
 class ToggleLessonSerializer(serializers.ModelSerializer):
     class Meta:
