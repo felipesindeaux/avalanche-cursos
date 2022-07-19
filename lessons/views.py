@@ -1,4 +1,5 @@
 from courses.models import Course
+from django.core.mail import send_mail
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (ListCreateAPIView,
@@ -42,7 +43,24 @@ class ListCreateLessonView(ListCreateAPIView):
 
         lesson = serializer.save(course=course)
 
-        if len(course.students.all()):
+        all_course_students = course.students.all()
+
+        if len(all_course_students):
+            students_emails = [
+                student.student.email for student in all_course_students
+            ]
+
+            send_mail(
+                f"New Lesson of {course.title.title()}",
+                """
+                    O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
+
+                    Pronto para {lesson_name}?
+                """.format(course_name=course.title.title(), lesson_name=lesson.title.title()),
+                None,
+                students_emails
+            )
+
             lesson_students = [
                 StudentLessons(student=student, lesson=lesson)
                 for student in course.students.all()
