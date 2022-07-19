@@ -1,18 +1,17 @@
 from courses.models import Course
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import ParseError, PermissionDenied
-from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-    UpdateAPIView,
-)
+from rest_framework.generics import (ListCreateAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from students_lessons.models import StudentLessons
 from utils import get_object_or_404, validate_uuid
 
 from .models import Lesson
-from .serializers import LessonSerializer, ToggleLessonSerializer
+from .serializers import (LessonSerializer, RetrieveLessonSerializer,
+                          ToggleLessonSerializer)
 
 
 class ListCreateLessonView(ListCreateAPIView):
@@ -52,7 +51,7 @@ class ListCreateLessonView(ListCreateAPIView):
 
 
 class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
-    serializer_class = LessonSerializer
+    serializer_class = RetrieveLessonSerializer
     queryset = Lesson.objects.all()
 
     authentication_classes = [TokenAuthentication]

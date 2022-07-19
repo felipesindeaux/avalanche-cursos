@@ -1,8 +1,8 @@
 from categories.models import Category
 from categories.serializers import CategorySerializer
-from rest_framework import serializers
 from lessons.models import Lesson
-
+from lessons.serializers import LessonSerializer
+from rest_framework import serializers
 from users.serializers import UserNameSerializer
 
 from .models import Course
@@ -15,7 +15,18 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = "__all__"
+        model = Course
+        fields = [
+            "id",
+            "title",
+            "description",
+            "price",
+            "total_hours",
+            "date_published",
+            "updated_at",
+            "owner",
+            "categories",
+        ]
 
     def create(self, validated_data: dict):
 
@@ -62,15 +73,26 @@ class CourseSerializer(serializers.ModelSerializer):
         }
 
 
-class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
+class ListCourseSerializer(serializers.ModelSerializer):
 
-    categories = CategorySerializer(many=True)
-    owner = UserNameSerializer()
     lessons_count = serializers.SerializerMethodField()
+    owner = UserNameSerializer()
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Course
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "description",
+            "price",
+            "total_hours",
+            "date_published",
+            "updated_at",
+            "lessons_count",
+            "owner",
+            "categories",
+        ]
         depth = 2
 
     def get_lessons_count(self, course: Course):
@@ -80,9 +102,38 @@ class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         return {
             **data,
-            "categories": map(
-                lambda data: data["name"],
-                data["categories"],
+            "categories": map(lambda data: data["name"], data["categories"]),
+        }
+
+
+class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
+
+    owner = UserNameSerializer()
+    lessons = LessonSerializer(many=True)
+    categories = CategorySerializer(many=True)
+
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "title",
+            "description",
+            "price",
+            "total_hours",
+            "date_published",
+            "updated_at",
+            "owner",
+            "lessons",
+            "categories",
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return {
+            **data,
+            "categories": map(lambda data: data["name"], data["categories"]),
+            "lessons": map(
+                lambda data: {"id": data["id"], "title": data["title"]}, data["lessons"]
             ),
         }
 
