@@ -1,5 +1,8 @@
 from courses.models import Course
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template, render_to_string
+from django.utils.html import strip_tags
+from drf_spectacular.utils import extend_schema
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
@@ -22,6 +25,7 @@ from .serializers import (
 )
 
 
+@extend_schema(tags=["Lessons"])
 class ListCreateLessonView(ListCreateAPIView):
     serializer_class = LessonSerializer
 
@@ -76,27 +80,25 @@ class ListCreateLessonView(ListCreateAPIView):
         all_course_students = course.students.all()
 
         if len(all_course_students):
-            email_messages = (
-                (
-                    f"New Lesson of {course.title.title()}",
-                    """
-                        Olá {student_name}, tudo bem?
 
-                        O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
+            for student in all_course_students:
 
-                        Pronto para {lesson_name}? 🥵
-                    """.format(
-                        student_name=student.student.name.title(),
-                        course_name=course.title.title(),
-                        lesson_name=lesson.title.title(),
-                    ),
+                email_html = get_template("email_template.html")
+                email_context = {
+                    "student_name": student.student.name.title(),
+                    "course_name": course.title.title(),
+                    "lesson_name": lesson.title.title(),
+                }
+
+                email = EmailMultiAlternatives(
+                    f"Novo lição de {course.title.title()} 🏔",
+                    strip_tags(render_to_string("email_template.html", email_context)),
                     None,
                     [student.student.email],
                 )
-                for student in all_course_students
-            )
 
-            send_mass_mail(email_messages)
+                email.attach_alternative(email_html.render(email_context), "text/html")
+                email.send()
 
             lesson_students = [
                 StudentLessons(student=student, lesson=lesson)
@@ -106,6 +108,7 @@ class ListCreateLessonView(ListCreateAPIView):
             StudentLessons.objects.bulk_create(lesson_students)
 
 
+@extend_schema(tags=["Lessons"])
 class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
     serializer_class = RetrieveLessonSerializer
     queryset = Lesson.objects.all()
@@ -152,6 +155,7 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         instance.delete()
 
 
+@extend_schema(tags=["Lessons"])
 class ActivateLessonView(UpdateAPIView):
     serializer_class = ToggleLessonSerializer
     queryset = Lesson.objects.all()
@@ -172,6 +176,7 @@ class ActivateLessonView(UpdateAPIView):
         serializer.save(is_active=True)
 
 
+@extend_schema(tags=["Lessons"])
 class DeactivateLessonView(UpdateAPIView):
     serializer_class = ToggleLessonSerializer
     queryset = Lesson.objects.all()

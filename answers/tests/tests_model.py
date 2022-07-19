@@ -1,3 +1,4 @@
+
 from datetime import datetime as dt
 
 from answers.models import Answer
@@ -36,13 +37,16 @@ class AnswerTest(TestCase):
     def test_onwer_of_answer(self):
         answer = Answer.objects.create(
             **self.answer_data, user=self.user, question=self.question)
+
         answer.save()
         self.assertIn("user_id", answer.__dict__)
         self.assertEqual(self.user.id, answer.user_id)
 
     def test_answer_has_information_fields(self):
+
         answer = Answer.objects.create(
             **self.answer_data, user=self.user, question=self.question)
+
         answer.save()
         date_now = dt.strftime(dt.now(), "%D")
         date_model = dt.strftime(answer.date_published, "%D")

@@ -57,6 +57,7 @@ class AnswerTestView(APITestCase):
         self.assertIn("user_id", response.data)
 
     def test_create_question_with_invalid_value(self):
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
@@ -83,6 +84,7 @@ class AnswerTestView(APITestCase):
 
         response = self.client.get(
             f"/api/questions/{self.question.id}/answers/")
+
         # está retornando um warning, não achei nada que eu possa resolver isto
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)

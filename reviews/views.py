@@ -7,8 +7,9 @@ from utils import get_object_or_404
 from reviews.models import Review
 from reviews.permissions import IsReviewOwner, StudentHaveCourse
 from reviews.serializers import ReviewSerializer
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(tags=['Reviews'])
 class GetOrCreateReviewView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, StudentHaveCourse]
@@ -26,7 +27,7 @@ class GetOrCreateReviewView(generics.ListCreateAPIView):
         course_id = self.kwargs.get("course_id")
         return Review.objects.filter(course__id=course_id)
 
-
+@extend_schema(tags=['Reviews'])
 class RetrieveReviewView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsReviewOwner]

@@ -10,8 +10,9 @@ from tasks.models import Task
 from tasks.permissions import (HasCourseBond, HasCourseBondTaks,
                                IsTeacherOwner, IsTeacherOwnerTask)
 from tasks.serializers import TaskSerializer, ToggleTaskSerializer
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(tags=['Tasks'])
 class ListCreateTaskView(ListCreateAPIView):
     serializer_class = TaskSerializer
 
@@ -29,11 +30,12 @@ class ListCreateTaskView(ListCreateAPIView):
     def perform_create(self, serializer):
 
         lesson = get_object_or_404(
+
             Lesson, "Lesson not found", id=self.kwargs["lesson_id"])
 
         serializer.save(lesson=lesson)
 
-
+@extend_schema(tags=['Tasks'])
 class RetrieveUpdateDeleteTaskView(RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
@@ -41,7 +43,7 @@ class RetrieveUpdateDeleteTaskView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, HasCourseBondTaks]
 
-
+@extend_schema(tags=['Tasks'])
 class ActivateTaskView(UpdateAPIView):
     serializer_class = ToggleTaskSerializer
     queryset = Task.objects.all()
@@ -53,7 +55,7 @@ class ActivateTaskView(UpdateAPIView):
     def perform_update(self, serializer):
         serializer.save(is_active=True)
 
-
+@extend_schema(tags=['Tasks'])
 class DeactivateTaskView(UpdateAPIView):
     serializer_class = ToggleTaskSerializer
     queryset = Task.objects.all()

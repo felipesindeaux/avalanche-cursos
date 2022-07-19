@@ -1,3 +1,4 @@
+
 from courses.models import Course
 from django.core.exceptions import ObjectDoesNotExist
 from lessons.models import Lesson
@@ -46,6 +47,7 @@ class HasCourseBondTaks(permissions.BasePermission):
         lesson = get_object_or_404(Lesson, pk=task.lesson.id)
         course = get_object_or_404(Course, pk=lesson.course_id)
         if course.owner == request.user:
+
             return True
 
         if request.method in permissions.SAFE_METHODS:
@@ -68,6 +70,7 @@ class HasCourseBond(permissions.BasePermission):
             lesson = get_object_or_404(Lesson, pk=lesson_id)
             course = get_object_or_404(Course, pk=lesson.course_id)
             if course.owner == request.user or request.user.is_superuser:
+
                 return True
 
             try:
