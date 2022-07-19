@@ -4,13 +4,13 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string, get_template
 from django.utils.html import strip_tags
 
-
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
-    UpdateAPIView,
+    UpdateAPIView
+
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
@@ -21,7 +21,7 @@ from .models import Lesson
 from .serializers import (
     LessonSerializer,
     RetrieveLessonSerializer,
-    ToggleLessonSerializer,
+    ToggleLessonSerializer
 )
 
 

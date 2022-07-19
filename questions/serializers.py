@@ -3,11 +3,13 @@ from categories.models import Category
 from rest_framework import serializers
 
 from .models import Question
+from categories.serializers import CategorySerializer
 
 
 class QuestionSerializer(serializers.ModelSerializer):
 
     answers_count = serializers.SerializerMethodField()
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Question
@@ -15,7 +17,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         depth = 1
 
     def create(self, validated_data: dict):
-
         categories = validated_data.pop("categories")
 
         question = Question.objects.create(**validated_data)

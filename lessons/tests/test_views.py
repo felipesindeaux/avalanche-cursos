@@ -91,8 +91,7 @@ class TestCreateLesson(APITestCase):
             f"/api/courses/1322asdasd13213/lessons/", data=LESSON_DATA
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual("invalid", response.data["detail"].code)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_lesson_with_unexistent_course_id(self):
         self.client.credentials(
@@ -221,7 +220,7 @@ class TestListLesson(APITestCase):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
     def test_get_lessons_as_admin_success(self):
         self.client.credentials(
@@ -230,7 +229,7 @@ class TestListLesson(APITestCase):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
     def test_get_lessons_as_student_success(self):
         self.client.credentials(
@@ -241,7 +240,7 @@ class TestListLesson(APITestCase):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
     def test_get_lessons_without_token_fail(self):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
