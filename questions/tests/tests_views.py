@@ -61,10 +61,8 @@ class AnswerTestView(APITestCase):
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
-
         self.client.post("/api/questions/",
                          data=self.question_data, format="json")
-
 
         response = self.client.get("/api/questions/?page=1")
 

@@ -4,9 +4,7 @@ from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
-
 from utils import get_object_or_404
-
 
 from tasks.models import Task
 from tasks.permissions import (HasCourseBond, HasCourseBondTaks,
@@ -33,7 +31,6 @@ class ListCreateTaskView(ListCreateAPIView):
         lesson = get_object_or_404(
 
             Lesson, "Lesson not found", id=self.kwargs["lesson_id"])
-
 
         serializer.save(lesson=lesson)
 

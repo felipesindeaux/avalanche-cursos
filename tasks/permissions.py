@@ -9,11 +9,10 @@ from utils import get_object_or_404
 from tasks.models import Task
 
 
-
 class IsTeacherOwner(permissions.BasePermission):
 
     def has_permission(self, request, view):
-    
+
         lesson_id = view.kwargs.get("lesson_id")
         lesson = get_object_or_404(Lesson, pk=lesson_id)
         course = get_object_or_404(Course, pk=lesson.course_id)
@@ -35,7 +34,6 @@ class IsAdmServer(permissions.BasePermission):
 
     def has_permission(self, request, view):
 
-
         return request.user.is_superuser
 
 
@@ -52,7 +50,6 @@ class HasCourseBondTaks(permissions.BasePermission):
 
             return True
 
-
         if request.method in permissions.SAFE_METHODS:
             if request.user.is_superuser:
                 return True
@@ -62,9 +59,7 @@ class HasCourseBondTaks(permissions.BasePermission):
             except ObjectDoesNotExist:
                 return False
 
-
         return False
-
 
 
 class HasCourseBond(permissions.BasePermission):
@@ -78,13 +73,10 @@ class HasCourseBond(permissions.BasePermission):
 
                 return True
 
-
             try:
                 Student.objects.get(course=course, student=request.user)
                 return True
             except ObjectDoesNotExist:
                 return False
 
-
         return False
-

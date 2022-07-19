@@ -8,7 +8,6 @@ from questions.models import Question
 from users.models import User
 
 
-
 class AnswerTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
@@ -21,22 +20,17 @@ class AnswerTest(TestCase):
             "description": "Description",
         }
 
-
         cls.question = Question.objects.create(
             **cls.question_data, user=cls.user)
-
 
         Category.objects.create(name="TEST")
         cls.category = Category.objects.all()
         cls.question.categories.set(cls.category)
         cls.question.save()
 
-
-
         cls.answer_data = {
             "content": "Resposta Teste"
         }
-
 
         cls.content = "Resposta Teste"
 

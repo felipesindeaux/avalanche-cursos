@@ -1,5 +1,6 @@
-from django.db import models
 import uuid
+
+from django.db import models
 
 
 class Answer(models.Model):
@@ -8,6 +9,7 @@ class Answer(models.Model):
     date_published = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="answers")
-    question = models.ForeignKey("questions.Question", on_delete=models.CASCADE, related_name="answers")
-
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="answers")
+    question = models.ForeignKey(
+        "questions.Question", on_delete=models.CASCADE, related_name="answers")
