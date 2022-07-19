@@ -3,14 +3,18 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import NotAcceptable
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Response, status
-from rest_framework.exceptions import NotAcceptable
 
 from .mixins import SerializerByMethodMixin
 from .models import User
-from .serializers import (LoginSerializer, UpdateUserSerializer,
-                          UpdateUserStatusSerializer, UserSerializer)
+from .serializers import (
+    LoginSerializer,
+    UpdateUserSerializer,
+    UpdateUserStatusSerializer,
+    UserSerializer,
+)
 
 
 class ManagementUserView(generics.UpdateAPIView):
@@ -21,10 +25,10 @@ class ManagementUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UpdateUserStatusSerializer
 
-    lookup_url_kwarg = 'id'
+    lookup_url_kwarg = "id"
 
     def perform_update(self, serializer):
-        user = get_object_or_404(User, pk=self.kwargs['id'])
+        user = get_object_or_404(User, pk=self.kwargs["id"])
         if self.request.user != user:
             serializer.save()
         else:
@@ -70,19 +74,22 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(APIView):
     queryset = User.objects.all()
     serializer_class = LoginSerializer
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
         user = authenticate(
-            username=serializer.validated_data['email'],
-            password=serializer.validated_data['password']
+            username=serializer.validated_data["email"],
+            password=serializer.validated_data["password"],
         )
 
         if user:
             token = Token.objects.get_or_create(user=user)[0]
 
-            return Response({'token': token.key})
+            return Response({"token": token.key})
 
-        return Response({"detail": 'invalid email or password'}, status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"detail": "invalid email or password"}, status.HTTP_401_UNAUTHORIZED
+        )
