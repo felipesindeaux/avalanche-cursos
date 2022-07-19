@@ -1,16 +1,11 @@
 from answers.models import Answer
 from categories.models import Category
-from categories.serializers import CategorySerializer
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from users.serializers import UserIdSerializer
 
 from .models import Question
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    user = UserIdSerializer(read_only=True)
-    categories = CategorySerializer(many=True)
 
     answers_count = serializers.SerializerMethodField()
 
