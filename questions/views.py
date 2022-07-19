@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from questions.permissions import IsOwnerAndAdminToDelete
 
 from .models import Question
-from .serializers import QuestionSerializer
+from .serializers import QuestionSerializer, QuestionDetailSerializer
 
 
 @extend_schema(tags=["Questions"])
@@ -37,7 +37,7 @@ class RetrieveUpdateDestroyQuestionView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerAndAdminToDelete]
 
-    serializer_class = QuestionSerializer
+    serializer_class = QuestionDetailSerializer
     lookup_url_kwarg = "question_id"
 
     def get_queryset(self):
