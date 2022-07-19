@@ -29,13 +29,13 @@ class LessonSerializer(serializers.ModelSerializer):
     def get_tasks_count(self, instance):
         return Task.objects.filter(lesson_id=instance.id).count()
 
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     video = data.get("video", None)
-    #     if video:
-    #         video_url_formatted = video[0 : video.index("?")]
-    #         return {**data, "video": video_url_formatted}
-    #     return data
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        video = data.get("video", None)
+        if video:
+            video_url_formatted = video[0 : video.index("?")]
+            return {**data, "video": video_url_formatted}
+        return data
 
 
 class RetrieveLessonSerializer(serializers.ModelSerializer):
