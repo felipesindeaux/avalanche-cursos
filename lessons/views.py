@@ -3,31 +3,22 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.utils.html import strip_tags
 from drf_spectacular.utils import extend_schema
+from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-    UpdateAPIView,
-)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from students.models import Student
 from students_lessons.models import StudentLessons
 from utils import get_object_or_404
 
+from . import serializers
 from .models import Lesson
-from .serializers import (
-    LessonSerializer,
-    RetrieveLessonSerializer,
-    ToggleCompletedSerializer,
-    ToggleLessonSerializer,
-)
 
 
 @extend_schema(tags=["Lessons"])
-class ListCreateLessonView(ListCreateAPIView):
-    serializer_class = LessonSerializer
+class ListCreateLessonView(generics.ListCreateAPIView):
+    serializer_class = serializers.LessonSerializer
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -109,8 +100,8 @@ class ListCreateLessonView(ListCreateAPIView):
 
 
 @extend_schema(tags=["Lessons"])
-class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
-    serializer_class = RetrieveLessonSerializer
+class RetrieveUpdateDeleteLessonView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.RetrieveLessonSerializer
     queryset = Lesson.objects.all()
 
     authentication_classes = [TokenAuthentication]
@@ -156,8 +147,8 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema(tags=["Lessons"])
-class ActivateLessonView(UpdateAPIView):
-    serializer_class = ToggleLessonSerializer
+class ActivateLessonView(generics.UpdateAPIView):
+    serializer_class = serializers.ToggleLessonSerializer
     queryset = Lesson.objects.all()
 
     authentication_classes = [TokenAuthentication]
@@ -177,8 +168,8 @@ class ActivateLessonView(UpdateAPIView):
 
 
 @extend_schema(tags=["Lessons"])
-class DeactivateLessonView(UpdateAPIView):
-    serializer_class = ToggleLessonSerializer
+class DeactivateLessonView(generics.UpdateAPIView):
+    serializer_class = serializers.ToggleLessonSerializer
     queryset = Lesson.objects.all()
 
     authentication_classes = [TokenAuthentication]
@@ -197,8 +188,8 @@ class DeactivateLessonView(UpdateAPIView):
         serializer.save(is_active=False)
 
 
-class CompleteLessonView(UpdateAPIView):
-    serializer_class = ToggleCompletedSerializer
+class CompleteLessonView(generics.UpdateAPIView):
+    serializer_class = serializers.ToggleCompletedSerializer
     queryset = Lesson.objects.all()
 
     authentication_classes = [TokenAuthentication]

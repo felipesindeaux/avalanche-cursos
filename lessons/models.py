@@ -9,9 +9,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
     video = models.FileField(
-        null=True, validators=[
-            FileExtensionValidator(allowed_extensions=["mp4"])
-        ]
+        null=True, validators=[FileExtensionValidator(allowed_extensions=["mp4"])]
     )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

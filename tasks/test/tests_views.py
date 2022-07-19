@@ -76,8 +76,7 @@ class TestCreateTasksViews(APITestCase):
         cls.lesson_2 = Lesson.objects.create(**LESSON_DATA, course=cls.course)
 
     def test_create_task_with_teacher(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.post(
             f"/api/lessons/{self.lesson_1.id}/tasks/", data=TASK_DATA, format="json"
@@ -92,8 +91,7 @@ class TestCreateTasksViews(APITestCase):
         self.assertTrue("resolution")
 
     def test_create_task_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.post(
             f"/api/lessons/{self.lesson_1.id}/tasks/", data=TASK_DATA, format="json"
@@ -103,8 +101,7 @@ class TestCreateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_create_task_with_student(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.post(
             f"/api/lessons/{self.lesson_1.id}/tasks/", data=TASK_DATA, format="json"
@@ -114,8 +111,7 @@ class TestCreateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_create_task_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.post(
             f"/api/lessons/{self.lesson_1.id}/tasks/", data=TASK_DATA, format="json"
@@ -125,8 +121,7 @@ class TestCreateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_create_task_to_not_exists_lesson(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.post(
             f"/api/lessons/Invalid_ID_Lesson/tasks/", data=TASK_DATA, format="json"
@@ -135,8 +130,7 @@ class TestCreateTasksViews(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_task_with_invalid_request(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.post(
             f"/api/lessons/{self.lesson_1.id}/tasks/",
@@ -184,8 +178,7 @@ class TestListTasksViews(APITestCase):
         ]
 
     def test_list_tasks_with_student_not_buy_the_course(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.get(f"/api/lessons/{self.lesson_1.id}/tasks/")
 
@@ -193,8 +186,7 @@ class TestListTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_list_tasks_with_student_of_bought_the_course(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
         self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         response = self.client.get(f"/api/lessons/{self.lesson_1.id}/tasks/")
@@ -204,8 +196,7 @@ class TestListTasksViews(APITestCase):
         self.assertEqual(5, response.data["count"])
 
     def test_list_tasks_with_teacher_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
         self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         response = self.client.get(f"/api/lessons/{self.lesson_1.id}/tasks/")
@@ -215,8 +206,7 @@ class TestListTasksViews(APITestCase):
         self.assertEqual(5, response.data["count"])
 
     def test_list_tasks_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.get(f"/api/lessons/{self.lesson_1.id}/tasks/")
 
@@ -224,8 +214,7 @@ class TestListTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_list_tasks_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.get(f"/api/lessons/{self.lesson_1.id}/tasks/")
 
@@ -234,8 +223,7 @@ class TestListTasksViews(APITestCase):
         self.assertEqual(5, response.data["count"])
 
     def test_retrieve_task_with_student_not_buy_the_course(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.get(f"/api/tasks/{self.tasks[0].id}/")
 
@@ -243,8 +231,7 @@ class TestListTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_retrieve_task_with_student_of_bought_the_course(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
         self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         response = self.client.get(f"/api/tasks/{self.tasks[0].id}/")
@@ -255,8 +242,7 @@ class TestListTasksViews(APITestCase):
         self.assertEqual(str(self.lesson_1.id), response.data["lesson_id"])
 
     def test_retrieve_task_with_teacher_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.get(f"/api/tasks/{self.tasks[0].id}/")
 
@@ -266,8 +252,7 @@ class TestListTasksViews(APITestCase):
         self.assertEqual(str(self.lesson_1.id), response.data["lesson_id"])
 
     def test_retrieve_task_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.get(f"/api/tasks/{self.tasks[0].id}/")
 
@@ -275,8 +260,7 @@ class TestListTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_retrieve_task_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.get(f"/api/tasks/{self.tasks[0].id}/")
 
@@ -316,8 +300,7 @@ class TestUpdateTasksViews(APITestCase):
         )
 
     def test_update_task_with_student(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.patch(
             f"/api/tasks/{self.tasks.id}/",
@@ -329,8 +312,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_update_task_with_teacher_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.patch(
             f"/api/tasks/{self.tasks.id}/",
@@ -343,8 +325,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertEqual("Update Teste", response.data["title"])
 
     def test_update_task_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.patch(
             f"/api/tasks/{self.tasks.id}/",
@@ -356,8 +337,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_update_task_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.patch(
             f"/api/tasks/{self.tasks.id}/",
@@ -369,8 +349,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_activate_task_with_teacher_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -379,8 +358,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertTrue(response.data["is_active"])
 
     def test_activate_task_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -388,8 +366,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_activate_task_with_student(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -397,8 +374,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_activate_task_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -406,8 +382,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_deactivate_task_with_teacher_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/deactivate/")
 
@@ -416,8 +391,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertFalse(response.data["is_active"])
 
     def test_deactivate_task_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -425,8 +399,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_deactivate_task_with_student(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -434,8 +407,7 @@ class TestUpdateTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_deactivate_task_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
 
@@ -470,16 +442,14 @@ class TestDeleteTasksViews(APITestCase):
         cls.tasks = Task.objects.create(**TASK_DATA, lesson=cls.lesson_1)
 
     def test_delete_task_with_admin(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
         response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_task_with_teacher_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
 
         response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
 
@@ -487,8 +457,7 @@ class TestDeleteTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_delete_task_with_teacher_not_owner(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
 
         response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
 
@@ -496,8 +465,7 @@ class TestDeleteTasksViews(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_delete_task_with_student(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.token_student.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
 
         response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
 

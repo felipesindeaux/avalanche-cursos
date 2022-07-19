@@ -24,16 +24,14 @@ class QuestionTest(TestCase):
         cls.description = "Description"
 
     def test_onwer_of_question(self):
-        question = Question.objects.create(
-            **self.question_data, user=self.user)
+        question = Question.objects.create(**self.question_data, user=self.user)
         question.categories.set(self.category)
         question.save()
         self.assertIn("user_id", question.__dict__)
         self.assertEqual(self.user.id, question.user_id)
 
     def test_question_has_information_fields(self):
-        question = Question.objects.create(
-            **self.question_data, user=self.user)
+        question = Question.objects.create(**self.question_data, user=self.user)
         question.categories.set(self.category)
         question.save()
 

@@ -1,16 +1,15 @@
 from django.urls import include, path
 
-from .views import (ListUsersView, LoginView, ManagementUserView, RegisterView,
-                    RetrieveUpdateUserView)
+from . import views
 
 urlpatterns = [
-    path('signin/', LoginView.as_view()),
-    path('register/', RegisterView.as_view()),
-    path('users/me/', RetrieveUpdateUserView.as_view()),
-    path('users/', ListUsersView.as_view()),
-    path('users/management/<uuid:id>/', ManagementUserView.as_view()),
+    path("signin/", views.LoginView.as_view()),
+    path("register/", views.RegisterView.as_view()),
+    path("users/me/", views.RetrieveUpdateUserView.as_view()),
+    path("users/", views.ListUsersView.as_view()),
+    path("users/management/<uuid:id>/", views.ManagementUserView.as_view()),
     path(
         "users/password_reset/",
-        include("django_rest_passwordreset.urls", namespace="password_reset")
-    )
+        include("django_rest_passwordreset.urls", namespace="password_reset"),
+    ),
 ]

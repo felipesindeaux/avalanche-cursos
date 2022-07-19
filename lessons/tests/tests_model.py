@@ -18,14 +18,14 @@ class LessonTest(TestCase):
             "title": "titulo do curso teste",
             "description": "descricao do curso teste kk",
             "price": 1.99,
-            "total_hours": 12
+            "total_hours": 12,
         }
 
         cls.course = Course.objects.create(**cls.course_data, owner=cls.user)
 
         cls.lesson_data = {
             "title": "lição teste",
-            "description": "lição teste descricao"
+            "description": "lição teste descricao",
         }
 
     def test_creation_of_lesson(self):

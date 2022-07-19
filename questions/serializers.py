@@ -1,9 +1,9 @@
 from answers.models import Answer
 from categories.models import Category
+from categories.serializers import CategorySerializer
 from rest_framework import serializers
 
 from .models import Question
-from categories.serializers import CategorySerializer
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -58,7 +58,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(QuestionSerializer, self).to_representation(instance)
-        categories = map(lambda data: data['name'], data['categories'])
+        categories = map(lambda data: data["name"], data["categories"])
         data = {
             "id": data["id"],
             "title": data["title"],

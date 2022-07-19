@@ -8,10 +8,7 @@ class StudentTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(
-            email="teste@mail.com",
-            name="teste",
-            password="123",
-            is_teacher=True
+            email="teste@mail.com", name="teste", password="123", is_teacher=True
         )
 
         cls.course = Course.objects.create(
@@ -19,14 +16,11 @@ class StudentTest(TestCase):
             description="curso descricao",
             price=1.99,
             total_hours=24,
-            owner=cls.user
+            owner=cls.user,
         )
 
     def test_student_creation(self):
-        student = Student.objects.create(
-            student=self.user,
-            course=self.course
-        )
+        student = Student.objects.create(student=self.user, course=self.course)
 
         student.save()
 
@@ -36,10 +30,7 @@ class StudentTest(TestCase):
         self.assertEqual(self.course.id, student.course_id)
 
     def test_is_completed_default_of_student(self):
-        student = Student.objects.create(
-            student=self.user,
-            course=self.course
-        )
+        student = Student.objects.create(student=self.user, course=self.course)
 
         student.save()
 

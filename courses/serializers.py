@@ -133,8 +133,7 @@ class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
             **data,
             "categories": map(lambda data: data["name"], data["categories"]),
             "lessons": map(
-                lambda data: {"id": data["id"],
-                              "title": data["title"]}, data["lessons"]
+                lambda data: {"id": data["id"], "title": data["title"]}, data["lessons"]
             ),
         }
 

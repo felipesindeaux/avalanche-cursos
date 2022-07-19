@@ -34,7 +34,7 @@ class LessonSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         video = data.get("video", None)
         if video:
-            video_url_formatted = video[0: video.index("?")]
+            video_url_formatted = video[0 : video.index("?")]
             return {**data, "video": video_url_formatted}
         return data
 
@@ -64,13 +64,12 @@ class RetrieveLessonSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         video = data.get("video", None)
         if video:
-            video_url_formatted = video[0: video.index("?")]
+            video_url_formatted = video[0 : video.index("?")]
             data = {**data, "video": video_url_formatted}
         return {
             **data,
             "tasks": map(
-                lambda data: {"id": data["id"],
-                              "title": data["title"]}, data["tasks"]
+                lambda data: {"id": data["id"], "title": data["title"]}, data["tasks"]
             ),
         }
 

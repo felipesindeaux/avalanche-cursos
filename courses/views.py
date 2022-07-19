@@ -8,32 +8,24 @@ from students.serializers import StudentsSerializer
 from students_lessons.models import StudentLessons
 from utils.get_object_or_404 import get_object_or_404
 
+from courses import serializers
 from courses.mixins import SerializerByMethodMixin, SerializerByUserRoleMixin
 from courses.models import Course
-from courses.serializers import (
-    CourseSerializer,
-    ListCourseSerializer,
-    RetrieveMyCoursesSerializer,
-    UpdateStatusCourseSerializer,
-)
 
-from .permissions import (
-    IsOwner,
-    IsOwnerAndAdminToDelete,
-    IsStudent,
-    IsTeacherOrReadOnly,
-    StudentHaventCourse,
-)
+from . import permissions
 
 
 @extend_schema(tags=["Courses"])
 class CreateListCourseView(SerializerByMethodMixin, generics.ListCreateAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, permissions.IsTeacherOrReadOnly]
 
-    serializer_class = CourseSerializer
-    serializer_map = {"POST": CourseSerializer, "GET": ListCourseSerializer}
+    serializer_class = serializers.CourseSerializer
+    serializer_map = {
+        "POST": serializers.CourseSerializer,
+        "GET": serializers.ListCourseSerializer,
+    }
 
     def get_queryset(self):
 
@@ -66,10 +58,13 @@ class RetrieveUpdateDestroyView(
 ):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsOwnerAndAdminToDelete]
+    permission_classes = [IsAuthenticated, permissions.IsOwnerAndAdminToDelete]
 
-    serializer_class = CourseSerializer
-    serializer_map = {"UPDATE": CourseSerializer, "GET": RetrieveMyCoursesSerializer}
+    serializer_class = serializers.CourseSerializer
+    serializer_map = {
+        "UPDATE": serializers.CourseSerializer,
+        "GET": serializers.RetrieveMyCoursesSerializer,
+    }
 
     queryset = Course.objects.all()
 
@@ -79,9 +74,9 @@ class ListCoursesView(SerializerByUserRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = RetrieveMyCoursesSerializer
+    serializer_class = serializers.RetrieveMyCoursesSerializer
     serializer_map = {
-        "Teacher": RetrieveMyCoursesSerializer,
+        "Teacher": serializers.RetrieveMyCoursesSerializer,
         "Student": StudentsSerializer,
     }
 
@@ -125,9 +120,9 @@ class ListCoursesView(SerializerByUserRoleMixin, generics.ListAPIView):
 class ActivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [permissions.IsOwner]
 
-    serializer_class = UpdateStatusCourseSerializer
+    serializer_class = serializers.UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
     def perform_update(self, serializer):
@@ -138,9 +133,9 @@ class ActivateCourseView(generics.UpdateAPIView):
 class DeactivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [permissions.IsOwner]
 
-    serializer_class = UpdateStatusCourseSerializer
+    serializer_class = serializers.UpdateStatusCourseSerializer
     queryset = Course.objects.all()
 
     def perform_update(self, serializer):
@@ -154,7 +149,7 @@ class CompleteCoursesView(generics.UpdateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent]
+    permission_classes = [IsAuthenticatedOrReadOnly, permissions.IsStudent]
 
     def get_object(self, queryset=None):
         return get_object_or_404(
@@ -175,7 +170,11 @@ class BuyCoursesView(generics.CreateAPIView):
     queryset = Student.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsStudent, StudentHaventCourse]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        permissions.IsStudent,
+        permissions.StudentHaventCourse,
+    ]
 
     def perform_create(self, serializer):
         course = get_object_or_404(Course, pk=self.kwargs["course_id"])

@@ -18,5 +18,4 @@ class Course(models.Model):
     owner = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="courses"
     )
-    categories = models.ManyToManyField(
-        "categories.Category", related_name="courses")
+    categories = models.ManyToManyField("categories.Category", related_name="courses")

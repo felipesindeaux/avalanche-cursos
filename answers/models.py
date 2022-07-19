@@ -10,6 +10,8 @@ class Answer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     user = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="answers")
+        "users.User", on_delete=models.CASCADE, related_name="answers"
+    )
     question = models.ForeignKey(
-        "questions.Question", on_delete=models.CASCADE, related_name="answers")
+        "questions.Question", on_delete=models.CASCADE, related_name="answers"
+    )

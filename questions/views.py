@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -7,9 +8,9 @@ from questions.permissions import IsOwnerAndAdminToDelete
 
 from .models import Question
 from .serializers import QuestionSerializer
-from drf_spectacular.utils import extend_schema
 
-@extend_schema(tags=['Questions'])
+
+@extend_schema(tags=["Questions"])
 class ListCreateQuestionView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -29,7 +30,8 @@ class ListCreateQuestionView(generics.ListCreateAPIView):
 
         return Question.objects.all()
 
-@extend_schema(tags=['Questions'])
+
+@extend_schema(tags=["Questions"])
 class RetrieveUpdateDestroyQuestionView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]

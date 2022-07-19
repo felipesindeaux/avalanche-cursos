@@ -1,4 +1,3 @@
-
 from courses.models import Course
 from django.core.exceptions import ObjectDoesNotExist
 from lessons.models import Lesson
@@ -10,7 +9,6 @@ from tasks.models import Task
 
 
 class IsTeacherOwner(permissions.BasePermission):
-
     def has_permission(self, request, view):
 
         lesson_id = view.kwargs.get("lesson_id")
@@ -21,7 +19,6 @@ class IsTeacherOwner(permissions.BasePermission):
 
 
 class IsTeacherOwnerTask(permissions.BasePermission):
-
     def has_permission(self, request, view):
         task_id = view.kwargs.get("pk")
         task = get_object_or_404(Task, pk=task_id)
@@ -31,7 +28,6 @@ class IsTeacherOwnerTask(permissions.BasePermission):
 
 
 class IsAdmServer(permissions.BasePermission):
-
     def has_permission(self, request, view):
 
         return request.user.is_superuser
@@ -39,7 +35,7 @@ class IsAdmServer(permissions.BasePermission):
 
 class HasCourseBondTaks(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'DELETE':
+        if request.method == "DELETE":
             return request.user.is_superuser
 
         task_id = view.kwargs.get("pk")
@@ -63,7 +59,6 @@ class HasCourseBondTaks(permissions.BasePermission):
 
 
 class HasCourseBond(permissions.BasePermission):
-
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             lesson_id = view.kwargs.get("lesson_id")
