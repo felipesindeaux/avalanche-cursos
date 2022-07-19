@@ -1,14 +1,16 @@
-from rest_framework import serializers
-
-from users.serializers import UserSerializer
 from questions.serializers import QuestionSerializer
+from rest_framework import serializers
+from users.serializers import UserSerializer
+
 from .models import Answer
 
 
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ['id', 'content', 'date_published', 'updated_at', 'question_id', 'user_id']
+        fields = ['id', 'content', 'date_published',
+                  'updated_at', 'question_id', 'user_id']
+
 
 class AnswerSerializerDetail(serializers.ModelSerializer):
     question = QuestionSerializer(read_only=True)
@@ -16,6 +18,5 @@ class AnswerSerializerDetail(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ['id', 'content', 'date_published', 'updated_at', 'question', 'user']
-
-
+        fields = ['id', 'content', 'date_published',
+                  'updated_at', 'question', 'user']
