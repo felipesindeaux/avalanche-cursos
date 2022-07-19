@@ -6,11 +6,13 @@ from rest_framework.permissions import (IsAuthenticated,
 from students.models import Student
 from students.serializers import StudentsSerializer
 from students_lessons.models import StudentLessons
+from students_lessons.serializers import StudentsLessonsSerializer
 from utils.get_object_or_404 import get_object_or_404
 
 from courses.mixins import SerializerByMethodMixin, SerializerByUserRoleMixin
 from courses.models import Course
-from courses.serializers import (CourseSerializer, RetrieveMyCoursesSerializer,
+from courses.serializers import (CourseSerializer, ListCourseSerializer,
+                                 RetrieveMyCoursesSerializer,
                                  UpdateStatusCourseSerializer)
 
 from .permissions import (IsOwner, IsOwnerAndAdminToDelete, IsStudent,
@@ -23,8 +25,7 @@ class CreateListCourseView(SerializerByMethodMixin, generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly]
 
     serializer_class = CourseSerializer
-    serializer_map = {"POST": CourseSerializer,
-                      "GET": RetrieveMyCoursesSerializer}
+    serializer_map = {"POST": CourseSerializer, "GET": ListCourseSerializer}
 
     def get_queryset(self):
 
