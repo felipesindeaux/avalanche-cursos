@@ -4,6 +4,7 @@ from lessons.models import Lesson
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.views import status
+from students_lessons.models import StudentLessons
 from users.models import User
 
 LESSON_DATA = {
@@ -168,8 +169,9 @@ class TestCreateLesson(APITestCase):
             f"/api/courses/{self.course.id}/lessons/",
             data=LESSON_DATA,
         )
-        # FINALIZAR TESTE
-        self.assertEqual(response.status_code, status.HTTP_507_INSUFFICIENT_STORAGE)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        student_lessons = StudentLessons.objects.all()
+        self.assertEqual(len(student_lessons), 1)
 
 
 class TestListLesson(APITestCase):
