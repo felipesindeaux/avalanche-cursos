@@ -12,15 +12,13 @@ from reviews.serializers import ReviewSerializer
 class GetOrCreateReviewView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, StudentHaveCourse]
-
-    queryset = Review.objects.all()
-
     serializer_class = ReviewSerializer
 
     def perform_create(self, serializer):
 
         course = get_object_or_404(
-            Course, "Course not found", id=self.kwargs['course_id'])
+            Course, "Course not found", id=self.kwargs["course_id"]
+        )
 
         serializer.save(user=self.request.user, course=course)
 
