@@ -20,7 +20,8 @@ class StudentHaveCourse(permissions.BasePermission):
             return False
 
         course_id = view.kwargs.get("course_id")
-        course = get_object_or_404(Course, detail="Course not found", pk=course_id)
+        course = get_object_or_404(
+            Course, detail="Course not found", pk=course_id)
         try:
             Student.objects.get(course=course, student=request.user)
             return True
