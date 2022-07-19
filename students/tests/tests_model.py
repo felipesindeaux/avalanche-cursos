@@ -1,8 +1,7 @@
+from courses.models import Course
 from django.test import TestCase
-
 from students.models import Student
 from users.models import User
-from courses.models import Course
 
 
 class StudentTest(TestCase):
