@@ -1,7 +1,7 @@
 from rest_framework import serializers
+from tasks.models import Task
 
 from lessons.models import Lesson
-from tasks.models import Task
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class LessonSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         video = data.pop("video")
         if video:
-            video_url_formatted = video[0 : video.index("?")]
+            video_url_formatted = video[0: video.index("?")]
             return {**data, "video_url": video_url_formatted}
         return data
 
