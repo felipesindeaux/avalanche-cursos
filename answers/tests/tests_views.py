@@ -1,4 +1,3 @@
-
 from categories.models import Category
 from questions.models import Question
 from rest_framework.authtoken.models import Token

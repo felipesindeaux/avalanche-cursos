@@ -1,18 +1,23 @@
 from courses.models import Course
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import send_mass_mail
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import (ListCreateAPIView,
-                                     RetrieveUpdateDestroyAPIView,
-                                     UpdateAPIView)
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from students_lessons.models import StudentLessons
 from utils import get_object_or_404
 
 from .models import Lesson
-from .serializers import (LessonSerializer, RetrieveLessonSerializer,
-                          ToggleLessonSerializer)
+from .serializers import (
+    LessonSerializer,
+    RetrieveLessonSerializer,
+    ToggleLessonSerializer
+)
 
 
 class ListCreateLessonView(ListCreateAPIView):
