@@ -6,25 +6,9 @@ from .models import Answer
 
 
 class AnswerSerializer(serializers.ModelSerializer):
-    question = QuestionSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
-
     class Meta:
         model = Answer
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        data = super(AnswerSerializer, self).to_representation(instance)
-        data = {
-            "id": data["id"],
-            "content": data["content"],
-            "date_published": data["date_published"],
-            "updated_at": data["updated_at"],
-            "question_id": data["question"]["id"],
-            "user_id": data["user"]["id"],
-        }
-        return data
-
+        fields = ['id', 'content', 'date_published', 'updated_at', 'question_id', 'user_id']
 
 class AnswerSerializerDetail(serializers.ModelSerializer):
     question = QuestionSerializer(read_only=True)
@@ -32,18 +16,6 @@ class AnswerSerializerDetail(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        data = super(AnswerSerializerDetail, self).to_representation(instance)
-        data = {
-            "id": data["id"],
-            "content": data["content"],
-            "date_published": data["date_published"],
-            "updated_at": data["updated_at"],
-            "question": data["question"],
-            "user": data["user"],
-        }
-        return data
+        fields = ['id', 'content', 'date_published', 'updated_at', 'question', 'user']
 
 
