@@ -8,7 +8,6 @@ from .models import Student
 class StudentsSerializer(serializers.ModelSerializer):
 
     course = ListCourseSerializer(read_only=True)
-    # student = UserSerializer(read_only=True)
 
     class Meta:
         model = Student
