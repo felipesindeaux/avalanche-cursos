@@ -6,6 +6,7 @@ from rest_framework.generics import (
     UpdateAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from tasks.permissions import HasCourseBond, HasCourseBondTaks,  IsTeacherOwner,IsTeacherOwnerTask
 from utils import get_object_or_404, validate_uuid
 
 from tasks.models import Task
@@ -16,7 +17,7 @@ class ListCreateTaskView(ListCreateAPIView):
     serializer_class = TaskSerializer
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, (HasCourseBond | IsTeacherOwner)]
 
     def get_queryset(self):
         if self.request.user.is_teacher or self.request.user.is_superuser:
@@ -39,7 +40,7 @@ class RetrieveUpdateDeleteTaskView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasCourseBondTaks ]
 
 
 class ActivateTaskView(UpdateAPIView):
@@ -48,7 +49,7 @@ class ActivateTaskView(UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOwnerTask]
 
     def perform_update(self, serializer):
         serializer.save(is_active=True)
@@ -60,7 +61,7 @@ class DeactivateTaskView(UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOwnerTask]
 
     def perform_update(self, serializer):
         serializer.save(is_active=False)
