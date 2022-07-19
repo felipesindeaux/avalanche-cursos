@@ -1,13 +1,13 @@
 from courses.models import Course
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.exceptions import ParseError, PermissionDenied
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from students_lessons.models import StudentLessons
-from utils import get_object_or_404, validate_uuid
+from utils import get_object_or_404
 
 from .models import Lesson
 from .serializers import (LessonSerializer, RetrieveLessonSerializer,
@@ -29,15 +29,16 @@ class ListCreateLessonView(ListCreateAPIView):
             )
 
     def perform_create(self, serializer):
-        uuid = validate_uuid(self.kwargs["course_id"])
 
-        course = get_object_or_404(Course, "Course not found", id=uuid)
+        course = get_object_or_404(
+            Course, "Course not found", id=self.kwargs["course_id"])
 
         owner_id = course.owner.id
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied("You must be the course owner to create a lesson")
+            raise PermissionDenied(
+                "You must be the course owner to create a lesson")
 
         lesson = serializer.save(course=course)
 
@@ -63,7 +64,8 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         owner_id = lesson.course.owner.id
         authenticated_user = self.request.user
 
-        students = lesson.students_lessons.filter(student__student=authenticated_user)
+        students = lesson.students_lessons.filter(
+            student__student=authenticated_user)
 
         is_student = len(students) > 0
         is_owner = owner_id == authenticated_user.id
@@ -83,7 +85,8 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied("You must be the course owner to update this lesson")
+            raise PermissionDenied(
+                "You must be the course owner to update this lesson")
 
         serializer.save()
 
@@ -111,7 +114,8 @@ class ActivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied("You must be the course owner to update this lesson")
+            raise PermissionDenied(
+                "You must be the course owner to update this lesson")
 
         serializer.save(is_active=True)
 
@@ -131,6 +135,7 @@ class DeactivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied("You must be the owner to update this lesson")
+            raise PermissionDenied(
+                "You must be the owner to update this lesson")
 
         serializer.save(is_active=False)

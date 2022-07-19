@@ -1,5 +1,6 @@
-from django.db import models
 import uuid
+
+from django.db import models
 
 
 class Question(models.Model):
@@ -10,6 +11,8 @@ class Question(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="questions")
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="questions")
 
-    categories = models.ManyToManyField("categories.Category", related_name="questions")
+    categories = models.ManyToManyField(
+        "categories.Category", related_name="questions")

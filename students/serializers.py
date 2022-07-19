@@ -12,12 +12,4 @@ class StudentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        student = data.pop("student")
-        return {
-            **data,
-            "student_id": student["id"],
-        }
+        fields = ['id', 'course', 'is_completed', 'student_id']

@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
-
-from questions.permissions import IsOwnerAndAdminToDelete
-from .models import Question
-from .serializers import QuestionSerializer
-
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+from questions.permissions import IsOwnerAndAdminToDelete
+
+from .models import Question
+from .serializers import QuestionSerializer
 
 
 class ListCreateQuestionView(generics.ListCreateAPIView):

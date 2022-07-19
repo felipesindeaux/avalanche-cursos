@@ -73,7 +73,8 @@ class TestCreateLesson(APITestCase):
         cls.course.save()
 
     def test_create_lesson_as_teacher_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
 
         response = self.client.post(
             f"/api/courses/{self.course.id}/lessons/", data=LESSON_DATA
@@ -83,7 +84,8 @@ class TestCreateLesson(APITestCase):
         self.assertIn("id", response.data)
 
     def test_create_lesson_with_invalid_course_id(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
 
         response = self.client.post(
             f"/api/courses/1322asdasd13213/lessons/", data=LESSON_DATA
@@ -93,7 +95,8 @@ class TestCreateLesson(APITestCase):
         self.assertEqual("invalid", response.data["detail"].code)
 
     def test_create_lesson_with_unexistent_course_id(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
 
         response = self.client.post(
             f"/api/courses/b024b8d9-39ae-4159-bac4-62c6fad05b91/lessons/",
@@ -104,7 +107,8 @@ class TestCreateLesson(APITestCase):
         self.assertEqual("not_found", response.data["detail"].code)
 
     def test_create_lesson_as_admin_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
         response = self.client.post(
             f"/api/courses/{self.course.id}/lessons/", data=LESSON_DATA
@@ -114,7 +118,8 @@ class TestCreateLesson(APITestCase):
         self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_create_lesson_as_student_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course.id}/")
 
@@ -134,7 +139,8 @@ class TestCreateLesson(APITestCase):
         self.assertEqual("not_authenticated", response.data["detail"].code)
 
     def test_create_lesson_with_additional_data_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
 
         response = self.client.post(
             f"/api/courses/{self.course.id}/lessons/",
@@ -147,7 +153,8 @@ class TestCreateLesson(APITestCase):
             self.assertNotEqual(response.data[key], value)
 
     def test_create_lesson_with_missing_data_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
 
         response = self.client.post(
             f"/api/courses/{self.course.id}/lessons/",
@@ -159,11 +166,13 @@ class TestCreateLesson(APITestCase):
         self.assertEqual("required", response.data["description"][0].code)
 
     def test_create_lesson_affect_student_lessons_table(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course.id}/")
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
 
         response = self.client.post(
             f"/api/courses/{self.course.id}/lessons/",
@@ -206,7 +215,8 @@ class TestListLesson(APITestCase):
         ]
 
     def test_get_lessons_as_teacher_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
@@ -214,7 +224,8 @@ class TestListLesson(APITestCase):
         self.assertEqual(5, len(response.data))
 
     def test_get_lessons_as_admin_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
@@ -222,7 +233,8 @@ class TestListLesson(APITestCase):
         self.assertEqual(5, len(response.data))
 
     def test_get_lessons_as_student_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
@@ -238,7 +250,8 @@ class TestListLesson(APITestCase):
         self.assertEqual("not_authenticated", response.data["detail"].code)
 
     def test_retrieve_lesson_as_teacher_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
         response = self.client.get(f"/api/lessons/{self.lessons_1[0].id}/")
 
@@ -246,7 +259,8 @@ class TestListLesson(APITestCase):
         self.assertIn("id", response.data)
 
     def test_retrieve_lesson_as_admin_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
         response = self.client.get(f"/api/lessons/{self.lessons_1[0].id}/")
 
@@ -254,7 +268,8 @@ class TestListLesson(APITestCase):
         self.assertIn("id", response.data)
 
     def test_retrieve_lesson_as_student_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
@@ -270,7 +285,8 @@ class TestListLesson(APITestCase):
         self.assertEqual("not_authenticated", response.data["detail"].code)
 
     def test_retrieve_lesson_as_teacher_from_other_course_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_2.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_2.key)
 
         response = self.client.get(f"/api/lessons/{self.lessons_1[0].id}/")
 
@@ -278,7 +294,8 @@ class TestListLesson(APITestCase):
         self.assertIn("permission_denied", response.data["detail"].code)
 
     def test_retrieve_lesson_as_student_from_other_course_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
@@ -288,7 +305,8 @@ class TestListLesson(APITestCase):
         self.assertIn("permission_denied", response.data["detail"].code)
 
     def test_update_lesson_as_teacher_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
         response = self.client.patch(
             f"/api/lessons/{self.lessons_1[0].id}/",
@@ -299,7 +317,8 @@ class TestListLesson(APITestCase):
         self.assertIn("id", response.data)
 
     def test_update_lesson_as_student_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
@@ -312,7 +331,8 @@ class TestListLesson(APITestCase):
         self.assertIn("permission_denied", response.data["detail"].code)
 
     def test_update_lesson_as_admin_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
         response = self.client.patch(
             f"/api/lessons/{self.lessons_1[0].id}/",
@@ -332,7 +352,8 @@ class TestListLesson(APITestCase):
         self.assertIn("not_authenticated", response.data["detail"].code)
 
     def test_update_lesson_as_teacher_not_owner(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_2.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_2.key)
 
         response = self.client.patch(
             f"/api/lessons/{self.lessons_1[0].id}/",
@@ -343,7 +364,8 @@ class TestListLesson(APITestCase):
         self.assertIn("permission_denied", response.data["detail"].code)
 
     def test_update_lesson_with_additional_data_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
         response = self.client.patch(
             f"/api/lessons/{self.lessons_1[0].id}/",
@@ -356,59 +378,72 @@ class TestListLesson(APITestCase):
             self.assertNotEqual(response.data[key], value)
 
     def test_activate_lesson_as_teacher_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
-        response = self.client.patch(f"/api/lessons/{self.lessons_1[0].id}/activate/")
+        response = self.client.patch(
+            f"/api/lessons/{self.lessons_1[0].id}/activate/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["is_active"], True)
 
     def test_deactivate_lesson_as_teacher_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
-        response = self.client.patch(f"/api/lessons/{self.lessons_1[0].id}/deactivate/")
+        response = self.client.patch(
+            f"/api/lessons/{self.lessons_1[0].id}/deactivate/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["is_active"], False)
 
     def test_activate_lesson_as_admin_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
-        response = self.client.patch(f"/api/lessons/{self.lessons_1[0].id}/activate/")
+        response = self.client.patch(
+            f"/api/lessons/{self.lessons_1[0].id}/activate/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_deactivate_lesson_as_admin_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
-        response = self.client.patch(f"/api/lessons/{self.lessons_1[0].id}/deactivate/")
+        response = self.client.patch(
+            f"/api/lessons/{self.lessons_1[0].id}/deactivate/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_activate_lesson_as_student_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
-        response = self.client.patch(f"/api/lessons/{self.lessons_1[0].id}/activate/")
+        response = self.client.patch(
+            f"/api/lessons/{self.lessons_1[0].id}/activate/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_deactivate_lesson_as_student_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
-        response = self.client.patch(f"/api/lessons/{self.lessons_1[0].id}/deactivate/")
+        response = self.client.patch(
+            f"/api/lessons/{self.lessons_1[0].id}/deactivate/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_delete_lesson_as_teacher_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.teacher_token_1.key)
 
         response = self.client.delete(f"/api/lessons/{self.lessons_1[0].id}/")
 
@@ -416,7 +451,8 @@ class TestListLesson(APITestCase):
         self.assertEqual("permission_denied", response.data["detail"].code)
 
     def test_delete_lesson_as_student_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         self.client.post(f"/api/courses/buy/{self.course_1.id}/")
 
@@ -432,7 +468,8 @@ class TestListLesson(APITestCase):
         self.assertEqual("not_authenticated", response.data["detail"].code)
 
     def test_delete_lesson_as_admin_succcess(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.admin_token.key)
 
         response = self.client.delete(f"/api/lessons/{self.lessons_1[0].id}/")
 

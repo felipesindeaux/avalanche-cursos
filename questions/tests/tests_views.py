@@ -1,10 +1,6 @@
-from contextlib import nullcontext
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.views import status
-from categories.models import Category
-
-
 from users.models import User
 
 
@@ -31,7 +27,8 @@ class AnswerTestView(APITestCase):
         cls.token_data_wrong = Token.objects.create(user=cls.user_data_wrong)
 
     def test_create_question(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         response = self.client.post(
             "/api/questions/", data=self.question_data, format="json"
@@ -48,7 +45,8 @@ class AnswerTestView(APITestCase):
         self.assertIn("categories", response.data)
 
     def test_create_question_with_invalid_value(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         self.question_data["categories"] = ""
 
@@ -60,10 +58,11 @@ class AnswerTestView(APITestCase):
 
     def test_list_question_created(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
-        
-        self.client.post("/api/questions/", data=self.question_data, format="json")
+        self.client.post("/api/questions/",
+                         data=self.question_data, format="json")
 
         response = self.client.get("/api/questions/?page=1")
 
@@ -72,13 +71,15 @@ class AnswerTestView(APITestCase):
 
     def test_list_question_created_by_id(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         question = self.client.post(
             "/api/questions/", data=self.question_data, format="json"
         )
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
 
         response = self.client.get(f"/api/questions/{question.data['id']}/")
 
@@ -90,11 +91,11 @@ class AnswerTestView(APITestCase):
         response = self.client.get(f"/api/questions/0/")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
 
     def test_update_question(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         question = self.client.post(
             "/api/questions/", data=self.question_data, format="json"
@@ -112,13 +113,15 @@ class AnswerTestView(APITestCase):
 
     def test_update_question_not_be_owner(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         question = self.client.post(
             "/api/questions/", data=self.question_data, format="json"
         )
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
 
         response = self.client.patch(
             f"/api/questions/{question.data['id']}/", data={"title": "boa tarde"}, format="json"
@@ -129,7 +132,8 @@ class AnswerTestView(APITestCase):
 
     def test_delete_question_be_onwer(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         question = self.client.post(
             "/api/questions/", data=self.question_data, format="json"
@@ -142,16 +146,17 @@ class AnswerTestView(APITestCase):
 
     def test_delete_question_not_be_onwer(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
         question = self.client.post(
             "/api/questions/", data=self.question_data, format="json"
         )
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
 
         response = self.client.delete(f"/api/questions/{question.data['id']}/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
-
