@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from lessons.models import Lesson
 from tasks.models import Task
+from tasks.serializers import TaskSerializer
 
 
 class LessonSerializer(serializers.ModelSerializer):

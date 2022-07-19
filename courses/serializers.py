@@ -15,7 +15,18 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "description",
+            "price",
+            "total_hours",
+            "date_published",
+            "updated_at",
+            "lessons_count",
+            "categories",
+            "owner",
+        ]
 
     def create(self, validated_data: dict):
 
@@ -57,8 +68,16 @@ class CourseSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return {
-            **data,
+            "id": data["id"],
+            "title": data["title"],
+            "description": data["description"],
+            "price": data["price"],
+            "total_hours": data["total_hours"],
+            "date_published": data["date_published"],
+            "updated_at": data["updated_at"],
+            "lessons_count": data["lessons_count"],
             "categories": map(lambda data: data["name"], data["categories"]),
+            "owner": {"id": data["owner"]["id"], "name": data["owner"]["name"]},
         }
 
 
@@ -79,11 +98,16 @@ class RetrieveMyCoursesSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return {
-            **data,
-            "categories": map(
-                lambda data: data["name"],
-                data["categories"],
-            ),
+            "id": data["id"],
+            "title": data["title"],
+            "description": data["description"],
+            "price": data["price"],
+            "total_hours": data["total_hours"],
+            "date_published": data["date_published"],
+            "updated_at": data["updated_at"],
+            "lessons_count": data["lessons_count"],
+            "categories": map(lambda data: data["name"], data["categories"]),
+            "owner": {"id": data["owner"]["id"], "name": data["owner"]["name"]},
         }
 
 
