@@ -3,9 +3,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import NotAcceptable
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Response, status
-from rest_framework.exceptions import NotAcceptable
 
 from .mixins import SerializerByMethodMixin
 from .models import User
@@ -70,6 +70,7 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(APIView):
     queryset = User.objects.all()
     serializer_class = LoginSerializer
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 
