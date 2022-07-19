@@ -6,7 +6,12 @@ from rest_framework.generics import (
     UpdateAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
-from tasks.permissions import HasCourseBond, HasCourseBondTaks,  IsTeacherOwner,IsTeacherOwnerTask
+from tasks.permissions import (
+    HasCourseBond,
+    HasCourseBondTaks,
+    IsTeacherOwner,
+    IsTeacherOwnerTask,
+)
 from utils import get_object_or_404, validate_uuid
 
 from tasks.models import Task
@@ -28,9 +33,10 @@ class ListCreateTaskView(ListCreateAPIView):
             )
 
     def perform_create(self, serializer):
-        uuid = validate_uuid(self.kwargs["lesson_id"])
 
-        lesson = get_object_or_404(Lesson, "Lesson not found", id=uuid)
+        lesson = get_object_or_404(
+            Lesson, "Lesson not found", id=self.kwargs["lesson_id"]
+        )
 
         serializer.save(lesson=lesson)
 
@@ -40,7 +46,7 @@ class RetrieveUpdateDeleteTaskView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, HasCourseBondTaks ]
+    permission_classes = [IsAuthenticated, HasCourseBondTaks]
 
 
 class ActivateTaskView(UpdateAPIView):
