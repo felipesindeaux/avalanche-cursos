@@ -1,4 +1,5 @@
 from courses.models import Course
+from django.core.mail import send_mail
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import ParseError, PermissionDenied
 from rest_framework.generics import (
@@ -38,11 +39,29 @@ class ListCreateLessonView(ListCreateAPIView):
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied("You must be the course owner to create a lesson")
+            raise PermissionDenied(
+                "You must be the course owner to create a lesson")
 
         lesson = serializer.save(course=course)
 
-        if len(course.students.all()):
+        all_course_students = course.students.all()
+
+        if len(all_course_students):
+            students_emails = [
+                student.student.email for student in all_course_students
+            ]
+
+            send_mail(
+                f"New Lesson of {course.title.title()}",
+                """
+                    O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
+
+                    Pronto para {lesson_name}?
+                """.format(course_name=course.title.title(), lesson_name=lesson.title.title()),
+                None,
+                students_emails
+            )
+
             lesson_students = [
                 StudentLessons(student=student, lesson=lesson)
                 for student in course.students.all()
@@ -64,7 +83,8 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         owner_id = lesson.course.owner.id
         authenticated_user = self.request.user
 
-        students = lesson.students_lessons.filter(student__student=authenticated_user)
+        students = lesson.students_lessons.filter(
+            student__student=authenticated_user)
 
         is_student = len(students) > 0
         is_owner = owner_id == authenticated_user.id
@@ -84,7 +104,8 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied("You must be the course owner to update this lesson")
+            raise PermissionDenied(
+                "You must be the course owner to update this lesson")
 
         serializer.save()
 
@@ -112,7 +133,8 @@ class ActivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied("You must be the course owner to update this lesson")
+            raise PermissionDenied(
+                "You must be the course owner to update this lesson")
 
         serializer.save(is_active=True)
 
@@ -132,6 +154,7 @@ class DeactivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied("You must be the owner to update this lesson")
+            raise PermissionDenied(
+                "You must be the owner to update this lesson")
 
         serializer.save(is_active=False)
