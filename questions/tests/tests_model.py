@@ -1,11 +1,12 @@
-from django.test import TestCase
-from categories.models import Category
-from users.models import User
-from questions.models import Question
 from datetime import datetime as dt
 
+from categories.models import Category
+from django.test import TestCase
+from questions.models import Question
+from users.models import User
 
-class AnswerTest(TestCase):
+
+class QuestionTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(
@@ -23,14 +24,16 @@ class AnswerTest(TestCase):
         cls.description = "Description"
 
     def test_onwer_of_question(self):
-        question = Question.objects.create(**self.question_data, user=self.user)
+        question = Question.objects.create(
+            **self.question_data, user=self.user)
         question.categories.set(self.category)
         question.save()
         self.assertIn("user_id", question.__dict__)
         self.assertEqual(self.user.id, question.user_id)
 
     def test_question_has_information_fields(self):
-        question = Question.objects.create(**self.question_data, user=self.user)
+        question = Question.objects.create(
+            **self.question_data, user=self.user)
         question.categories.set(self.category)
         question.save()
 

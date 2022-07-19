@@ -4,19 +4,19 @@ from . import views
 
 urlpatterns = [
     path(
-        "lessons/<str:lesson_id>/tasks/",
+        "lessons/<uuid:lesson_id>/tasks/",
         views.ListCreateTaskView.as_view(),
     ),
     path(
-        "tasks/<str:pk>/",
+        "tasks/<uuid:pk>/",
         views.RetrieveUpdateDeleteTaskView.as_view(),
     ),
     path(
-        "tasks/<str:pk>/activate/",
+        "tasks/<uuid:pk>/activate/",
         views.ActivateTaskView.as_view(),
     ),
     path(
-        "tasks/<str:pk>/deactivate/",
+        "tasks/<uuid:pk>/deactivate/",
         views.DeactivateTaskView.as_view(),
     ),
 ]

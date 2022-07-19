@@ -52,7 +52,8 @@ class TestUserView(APITestCase):
 
     def test_list_all_users_without_permission(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_user.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user.key)
         response = self.client.get("/api/users/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -63,11 +64,12 @@ class TestUserView(APITestCase):
 
     def test_list_all_users(self):
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_super.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_super.key)
         response = self.client.get("/api/users/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(2, len(response.data))
+        self.assertEqual(2, len(response.data["results"]))
 
     def test_retrieve_my_user_without_token(self):
 
@@ -78,12 +80,14 @@ class TestUserView(APITestCase):
         )
 
     def test_retrieve_my_user(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_user.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user.key)
         response = self.client.get(f"/api/users/me/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["id"], str(self.user.id))
 
-        self.assertEqual(UserSerializer(instance=self.user).data, response.data)
+        self.assertEqual(UserSerializer(
+            instance=self.user).data, response.data)
 
     def test_update_my_user_without_token(self):
 
@@ -95,7 +99,8 @@ class TestUserView(APITestCase):
         )
 
     def test_update_my_user(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_user.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user.key)
         newName = {"name": "newname"}
         response = self.client.patch(f"/api/users/me/", data=newName)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

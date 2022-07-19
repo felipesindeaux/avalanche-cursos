@@ -1,10 +1,9 @@
-from django.test import TestCase
-
-from courses.models import Course
-from users.models import User
-from categories.models import Category
-
 from datetime import datetime as dt
+
+from categories.models import Category
+from courses.models import Course
+from django.test import TestCase
+from users.models import User
 
 
 class CourseTest(TestCase):

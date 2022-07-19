@@ -4,6 +4,7 @@ from lessons.models import Lesson
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.views import status
+from students_lessons.models import StudentLessons
 from users.models import User
 
 LESSON_DATA = {
@@ -88,8 +89,7 @@ class TestCreateLesson(APITestCase):
             f"/api/courses/1322asdasd13213/lessons/", data=LESSON_DATA
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual("invalid", response.data["detail"].code)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_lesson_with_unexistent_course_id(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.teacher_token.key)
@@ -168,8 +168,9 @@ class TestCreateLesson(APITestCase):
             f"/api/courses/{self.course.id}/lessons/",
             data=LESSON_DATA,
         )
-        # FINALIZAR TESTE
-        self.assertEqual(response.status_code, status.HTTP_507_INSUFFICIENT_STORAGE)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        student_lessons = StudentLessons.objects.all()
+        self.assertEqual(len(student_lessons), 1)
 
 
 class TestListLesson(APITestCase):
@@ -209,7 +210,7 @@ class TestListLesson(APITestCase):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
     def test_get_lessons_as_admin_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.admin_token.key)
@@ -217,7 +218,7 @@ class TestListLesson(APITestCase):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
     def test_get_lessons_as_student_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
@@ -227,7 +228,7 @@ class TestListLesson(APITestCase):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
     def test_get_lessons_without_token_fail(self):
         response = self.client.get(f"/api/courses/{self.course_1.id}/lessons/")
@@ -435,3 +436,51 @@ class TestListLesson(APITestCase):
         response = self.client.delete(f"/api/lessons/{self.lessons_1[0].id}/")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class TestCompleteLesson(APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        teacher = User.objects.create_user(**TEACHER_DATA_1)
+        cls.student = User.objects.create_user(**STUDENT_DATA)
+
+        cls.teacher_token = Token.objects.create(user=teacher)
+        cls.student_token = Token.objects.create(user=cls.student)
+        cls.course = Course.objects.create(owner=teacher, **COURSE_DATA)
+
+        Category.objects.create(**CATEGORY_DATA)
+        cls.categories = Category.objects.all()
+
+        cls.course.categories.set(cls.categories)
+        cls.course.save()
+
+        cls.lesson = Lesson.objects.create(**LESSON_DATA, course=cls.course)
+        cls.lesson.save()
+
+    def test_complete_lesson(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        response = self.client.patch(f"/api/lessons/complete/{self.lesson.id}/")
+
+        self.assertTrue(response.data["is_completed"])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_query_params_completed_lessons(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        first_response = self.client.get(
+            f"/api/courses/{self.course.id}/lessons/?completed=true"
+        )
+
+        self.assertEqual(0, len(first_response.data["results"]))
+
+        self.client.patch(f"/api/lessons/complete/{self.lesson.id}/")
+
+        second_response = self.client.get(
+            f"/api/courses/{self.course.id}/lessons/?completed=true"
+        )
+        self.assertEqual(1, len(second_response.data["results"]))

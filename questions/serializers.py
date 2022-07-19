@@ -1,26 +1,22 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers
 from answers.models import Answer
 from categories.models import Category
-from categories.serializers import CategorySerializer
+from rest_framework import serializers
 
-from users.serializers import UserIdSerializer
 from .models import Question
+from categories.serializers import CategorySerializer
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    user = UserIdSerializer(read_only=True)
-    categories = CategorySerializer(many=True)
-    
+
     answers_count = serializers.SerializerMethodField()
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Question
         fields = "__all__"
         depth = 1
-    
-    def create(self, validated_data: dict):
 
+    def create(self, validated_data: dict):
         categories = validated_data.pop("categories")
 
         question = Question.objects.create(**validated_data)
@@ -55,7 +51,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
 
     def get_answers_count(self, question: Question):
         answers_count = Answer.objects.filter(question_id=question.id).count()

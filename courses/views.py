@@ -1,24 +1,21 @@
+from drf_spectacular.utils import extend_schema
+from lessons.models import Lesson
+from rest_framework import generics
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from students.models import Student
+from students.serializers import StudentsSerializer
+from students_lessons.models import StudentLessons
 from utils.get_object_or_404 import get_object_or_404
 
-from lessons.models import Lesson
+from courses.mixins import SerializerByMethodMixin, SerializerByUserRoleMixin
 from courses.models import Course
-from students.models import Student
-
-from courses.mixins import SerializerByMethodMixin
-
-from students.serializers import StudentsSerializer
-from students_lessons.serializers import StudentsLessonsSerializer
 from courses.serializers import (
     CourseSerializer,
+    ListCourseSerializer,
     RetrieveMyCoursesSerializer,
     UpdateStatusCourseSerializer,
 )
-
-from rest_framework import generics
-
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-
 
 from .permissions import (
     IsOwner,
@@ -29,12 +26,14 @@ from .permissions import (
 )
 
 
-class CreateListCourseView(generics.ListCreateAPIView):
+@extend_schema(tags=["Courses"])
+class CreateListCourseView(SerializerByMethodMixin, generics.ListCreateAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly]
 
     serializer_class = CourseSerializer
+    serializer_map = {"POST": CourseSerializer, "GET": ListCourseSerializer}
 
     def get_queryset(self):
 
@@ -61,16 +60,22 @@ class CreateListCourseView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+@extend_schema(tags=["Courses"])
+class RetrieveUpdateDestroyView(
+    SerializerByMethodMixin, generics.RetrieveUpdateDestroyAPIView
+):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerAndAdminToDelete]
 
     serializer_class = CourseSerializer
+    serializer_map = {"UPDATE": CourseSerializer, "GET": RetrieveMyCoursesSerializer}
+
     queryset = Course.objects.all()
 
 
-class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
+@extend_schema(tags=["Courses"])
+class ListCoursesView(SerializerByUserRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -116,6 +121,7 @@ class ListCoursesView(SerializerByMethodMixin, generics.ListAPIView):
             return Student.objects.filter(student=self.request.user)
 
 
+@extend_schema(tags=["Courses"])
 class ActivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -128,6 +134,7 @@ class ActivateCourseView(generics.UpdateAPIView):
         serializer.save(is_active=True)
 
 
+@extend_schema(tags=["Courses"])
 class DeactivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -140,6 +147,7 @@ class DeactivateCourseView(generics.UpdateAPIView):
         serializer.save(is_active=False)
 
 
+@extend_schema(tags=["Courses"])
 class CompleteCoursesView(generics.UpdateAPIView):
 
     serializer_class = StudentsSerializer
@@ -160,6 +168,7 @@ class CompleteCoursesView(generics.UpdateAPIView):
         serializer.save(is_completed=True)
 
 
+@extend_schema(tags=["Courses"])
 class BuyCoursesView(generics.CreateAPIView):
 
     serializer_class = StudentsSerializer
@@ -174,9 +183,11 @@ class BuyCoursesView(generics.CreateAPIView):
         student_courses = serializer.save(student=self.request.user, course=course)
 
         lessons = Lesson.objects.filter(course=course)
-        if len(lessons) > 0:
-            for lesson in lessons:
-                serializer_lesson = StudentsLessonsSerializer(data={})
-                serializer_lesson.is_valid(raise_exception=True)
 
-                serializer_lesson.save(student=student_courses, lesson=lesson)
+        if len(lessons):
+            lesson_students = [
+                StudentLessons(student=student_courses, lesson=lesson)
+                for lesson in lessons
+            ]
+
+            StudentLessons.objects.bulk_create(lesson_students)

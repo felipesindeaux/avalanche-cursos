@@ -49,6 +49,7 @@ class StudentHaventCourse(permissions.BasePermission):
         course = get_object_or_404(Course, pk=course_id)
         try:
             Student.objects.get(course=course, student=request.user)
-            raise NotAcceptable(detail="You have already purchased this course")
+            raise NotAcceptable(
+                detail="You have already purchased this course")
         except ObjectDoesNotExist:
             return True

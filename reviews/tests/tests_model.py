@@ -1,7 +1,5 @@
-from categories.models import Category
 from courses.models import Course
 from django.test import TestCase
-from reviews.models import Review
 from users.models import User
 
 CATEGORY_DATA = {"name": "teste"}
