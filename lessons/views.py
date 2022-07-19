@@ -1,11 +1,16 @@
 from courses.models import Course
-from django.core.mail import send_mass_mail
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string, get_template
+from django.utils.html import strip_tags
+
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
     UpdateAPIView
+
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
@@ -37,40 +42,39 @@ class ListCreateLessonView(ListCreateAPIView):
     def perform_create(self, serializer):
 
         course = get_object_or_404(
-            Course, "Course not found", id=self.kwargs["course_id"])
+            Course, "Course not found", id=self.kwargs["course_id"]
+        )
 
         owner_id = course.owner.id
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied(
-                "You must be the course owner to create a lesson")
+            raise PermissionDenied("You must be the course owner to create a lesson")
 
         lesson = serializer.save(course=course)
 
         all_course_students = course.students.all()
 
         if len(all_course_students):
-            email_messages = (
-                (
-                    f"New Lesson of {course.title.title()}",
-                    """
-                        Olá {student_name}, tudo bem?
 
-                        O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
+            for student in all_course_students:
 
-                        Pronto para {lesson_name}? 🥵
-                    """.format(
-                        student_name=student.student.name.title(),
-                        course_name=course.title.title(),
-                        lesson_name=lesson.title.title()
-                    ),
+                email_html = get_template("email_template.html")
+                email_context = {
+                    "student_name": student.student.name.title(),
+                    "course_name": course.title.title(),
+                    "lesson_name": lesson.title.title(),
+                }
+
+                email = EmailMultiAlternatives(
+                    f"Novo lição de {course.title.title()} 🏔",
+                    strip_tags(render_to_string("email_template.html", email_context)),
                     None,
-                    [student.student.email]
-                ) for student in all_course_students
-            )
+                    [student.student.email],
+                )
 
-            send_mass_mail(email_messages)
+                email.attach_alternative(email_html.render(email_context), "text/html")
+                email.send()
 
             lesson_students = [
                 StudentLessons(student=student, lesson=lesson)
@@ -93,8 +97,7 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         owner_id = lesson.course.owner.id
         authenticated_user = self.request.user
 
-        students = lesson.students_lessons.filter(
-            student__student=authenticated_user)
+        students = lesson.students_lessons.filter(student__student=authenticated_user)
 
         is_student = len(students) > 0
         is_owner = owner_id == authenticated_user.id
@@ -114,8 +117,7 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied(
-                "You must be the course owner to update this lesson")
+            raise PermissionDenied("You must be the course owner to update this lesson")
 
         serializer.save()
 
@@ -143,8 +145,7 @@ class ActivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied(
-                "You must be the course owner to update this lesson")
+            raise PermissionDenied("You must be the course owner to update this lesson")
 
         serializer.save(is_active=True)
 
@@ -164,7 +165,6 @@ class DeactivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied(
-                "You must be the owner to update this lesson")
+            raise PermissionDenied("You must be the owner to update this lesson")
 
         serializer.save(is_active=False)
