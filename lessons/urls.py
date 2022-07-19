@@ -3,16 +3,18 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("courses/<course_id>/lessons/", views.ListCreateLessonView.as_view()),
+    path("courses/<uuid:course_id>/lessons/", views.ListCreateLessonView.as_view()),
     path(
-        "courses/<course_id>/lessons/<pk>/",
+        "lessons/<uuid:pk>/",
         views.RetrieveUpdateDeleteLessonView.as_view(),
     ),
+    path("lessons/<uuid:pk>/activate/", views.ActivateLessonView.as_view()),
     path(
-        "courses/<course_id>/lessons/<pk>/activate/", views.ActivateLessonView.as_view()
+        "lessons/<uuid:pk>/deactivate/",
+        views.DeactivateLessonView.as_view(),
     ),
     path(
-        "courses/<course_id>/lessons/<pk>/deactivate/",
-        views.DeactivateLessonView.as_view(),
+        "lessons/complete/<uuid:pk>/",
+        views.CompleteLessonView.as_view(),
     ),
 ]
