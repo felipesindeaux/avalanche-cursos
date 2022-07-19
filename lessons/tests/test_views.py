@@ -473,3 +473,49 @@ class TestListLesson(APITestCase):
         response = self.client.delete(f"/api/lessons/{self.lessons_1[0].id}/")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class TestCompleteLesson(APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        teacher = User.objects.create_user(**TEACHER_DATA_1)
+        cls.student = User.objects.create_user(**STUDENT_DATA)
+
+        cls.teacher_token = Token.objects.create(user=teacher)
+        cls.student_token = Token.objects.create(user=cls.student)
+        cls.course = Course.objects.create(owner=teacher, **COURSE_DATA)
+
+        Category.objects.create(**CATEGORY_DATA)
+        cls.categories = Category.objects.all()
+
+        cls.course.categories.set(cls.categories)
+        cls.course.save()
+
+        cls.lesson = Lesson.objects.create(**LESSON_DATA, course=cls.course)
+        cls.lesson.save()
+
+    def test_complete_lesson(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
+
+        response = self.client.patch(
+            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/")
+
+        self.assertTrue(response.data["is_completed"])
+
+    def test_query_params_completed_lessons(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.student_token.key)
+
+        first_response = self.client.get(
+            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/?completed=false")
+
+        self.assertEqual(0, len(first_response.data["results"]))
+
+        self.client.patch(
+            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/")
+
+        second_response = self.client.get(
+            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/?completed=true")
+
+        self.assertEqual(1, len(second_response.data["results"]))
