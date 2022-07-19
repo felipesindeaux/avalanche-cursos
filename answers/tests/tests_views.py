@@ -1,9 +1,11 @@
+
 from categories.models import Category
 from questions.models import Question
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.views import status
 from users.models import User
+
 
 
 class AnswerTestView(APITestCase):
@@ -19,8 +21,10 @@ class AnswerTestView(APITestCase):
             "description": "Description",
         }
 
+
         cls.question = Question.objects.create(
             **cls.question_data, user=cls.user)
+
 
         Category.objects.create(name="TEST")
         cls.category = Category.objects.all()
@@ -42,6 +46,7 @@ class AnswerTestView(APITestCase):
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
+
         response = self.client.post(
             f"/api/questions/{self.question.id}/answers/",
             data=self.answer_data,
@@ -57,8 +62,10 @@ class AnswerTestView(APITestCase):
         self.assertIn("user_id", response.data)
 
     def test_create_question_with_invalid_value(self):
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         self.answer_data["content"] = ""
 
@@ -72,8 +79,10 @@ class AnswerTestView(APITestCase):
 
     def test_list_answer_created(self):
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         self.client.post(
             f"/api/questions/{self.question.id}/answers/",
@@ -81,16 +90,20 @@ class AnswerTestView(APITestCase):
             format="json",
         )
 
+
         response = self.client.get(
             f"/api/questions/{self.question.id}/answers/")
+
         # está retornando um warning, não achei nada que eu possa resolver isto
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_list_answer_created_with_wrong_question_uuid(self):
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         ID = "55aa248a-ad0b-4558-a3b2-c4b62ce08b97"
 
@@ -105,14 +118,17 @@ class AnswerTestView(APITestCase):
 
     def test_list_answer_question_created(self):
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         answer = self.client.post(
             f"/api/questions/{self.question.id}/answers/",
             data=self.answer_data,
             format="json",
         )
+
 
         response = self.client.get(
             f"/api/questions/answers/{answer.data['id']}/")
@@ -125,6 +141,7 @@ class AnswerTestView(APITestCase):
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
 
+
         ID = "55aa248a-ad0b-4558-a3b2-c4b62ce08b97"
 
         response = self.client.get(f"/api/questions/answers/{ID}/")
@@ -135,6 +152,7 @@ class AnswerTestView(APITestCase):
 
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         answer = self.client.post(
             f"/api/questions/{self.question.id}/answers/",
@@ -156,8 +174,10 @@ class AnswerTestView(APITestCase):
 
     def test_update_answer_not_be_owner(self):
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         answer = self.client.post(
             f"/api/questions/{self.question.id}/answers/",
@@ -165,8 +185,10 @@ class AnswerTestView(APITestCase):
             format="json",
         )
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
+
 
         response = self.client.patch(
             f"/api/questions/answers/{answer.data['id']}/",
@@ -179,8 +201,10 @@ class AnswerTestView(APITestCase):
 
     def test_delete_answer_be_onwer(self):
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         answer = self.client.post(
             f"/api/questions/{self.question.id}/answers/",
@@ -190,14 +214,17 @@ class AnswerTestView(APITestCase):
 
         response = self.client.delete(
             f"/api/questions/answers/{answer.data['id']}/")
+
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertIsNone(response.data)
 
     def test_delete_answer_not_be_onwer(self):
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data.key)
+
 
         answer = self.client.post(
             f"/api/questions/{self.question.id}/answers/",
@@ -205,11 +232,13 @@ class AnswerTestView(APITestCase):
             format="json",
         )
 
+
         self.client.credentials(
             HTTP_AUTHORIZATION="Token " + self.token_data_wrong.key)
 
         response = self.client.delete(
             f"/api/questions/answers/{answer.data['id']}/")
+
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
