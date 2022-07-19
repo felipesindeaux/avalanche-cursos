@@ -458,27 +458,29 @@ class TestCompleteLesson(APITestCase):
         cls.lesson.save()
 
     def test_complete_lesson(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
-        response = self.client.patch(
-            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/")
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
+
+        response = self.client.patch(f"/api/lessons/complete/{self.lesson.id}/")
 
         self.assertTrue(response.data["is_completed"])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_query_params_completed_lessons(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + self.student_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
+
+        self.client.post(f"/api/courses/buy/{self.course.id}/")
 
         first_response = self.client.get(
-            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/?completed=false")
+            f"/api/courses/{self.course.id}/lessons/?completed=true"
+        )
 
         self.assertEqual(0, len(first_response.data["results"]))
 
-        self.client.patch(
-            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/")
+        self.client.patch(f"/api/lessons/complete/{self.lesson.id}/")
 
         second_response = self.client.get(
-            f"/api/courses/{self.course.id}/lessons/{self.lesson.id}/?completed=true")
-
+            f"/api/courses/{self.course.id}/lessons/?completed=true"
+        )
         self.assertEqual(1, len(second_response.data["results"]))
