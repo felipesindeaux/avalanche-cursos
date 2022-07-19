@@ -2,17 +2,24 @@ from courses.models import Course
 from django.core.mail import send_mail, send_mass_mail
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import (ListCreateAPIView,
-                                     RetrieveUpdateDestroyAPIView,
-                                     UpdateAPIView)
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
+from students.models import Student
 from students_lessons.models import StudentLessons
 from utils import get_object_or_404
 
 from .models import Lesson
-from .serializers import (LessonSerializer, RetrieveLessonSerializer,
-                          ToggleLessonSerializer)
+from .serializers import (
+    LessonSerializer,
+    RetrieveLessonSerializer,
+    ToggleCompletedSerializer,
+    ToggleLessonSerializer,
+)
 
 
 class ListCreateLessonView(ListCreateAPIView):
@@ -22,24 +29,47 @@ class ListCreateLessonView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.is_teacher or self.request.user.is_superuser:
-            return Lesson.objects.filter(course_id=self.kwargs["course_id"])
+        authenticated_user = self.request.user
+        course_id = self.kwargs["course_id"]
+
+        if authenticated_user.is_teacher or authenticated_user.is_superuser:
+            return Lesson.objects.filter(course_id=course_id)
         else:
-            return Lesson.objects.filter(
-                course_id=self.kwargs["course_id"], is_active=True
+            is_completed_param = self.request.GET.get("completed")
+
+            if not is_completed_param:
+                return Lesson.objects.filter(
+                    course_id=self.kwargs["course_id"], is_active=True
+                )
+
+            student = get_object_or_404(
+                Student,
+                "You did not buy this course",
+                student=authenticated_user.id,
+                course=course_id,
             )
+
+            is_completed = True if is_completed_param == "true" else False
+
+            student_lessons = student.lessons.filter(is_completed=is_completed)
+
+            return [
+                student_lesson.lesson
+                for student_lesson in student_lessons
+                if student_lesson.lesson.is_active
+            ]
 
     def perform_create(self, serializer):
 
         course = get_object_or_404(
-            Course, "Course not found", id=self.kwargs["course_id"])
+            Course, "Course not found", id=self.kwargs["course_id"]
+        )
 
         owner_id = course.owner.id
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied(
-                "You must be the course owner to create a lesson")
+            raise PermissionDenied("You must be the course owner to create a lesson")
 
         lesson = serializer.save(course=course)
 
@@ -58,11 +88,12 @@ class ListCreateLessonView(ListCreateAPIView):
                     """.format(
                         student_name=student.student.name.title(),
                         course_name=course.title.title(),
-                        lesson_name=lesson.title.title()
+                        lesson_name=lesson.title.title(),
                     ),
                     None,
-                    [student.student.email]
-                ) for student in all_course_students
+                    [student.student.email],
+                )
+                for student in all_course_students
             )
 
             send_mass_mail(email_messages)
@@ -88,8 +119,7 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         owner_id = lesson.course.owner.id
         authenticated_user = self.request.user
 
-        students = lesson.students_lessons.filter(
-            student__student=authenticated_user)
+        students = lesson.students_lessons.filter(student__student=authenticated_user)
 
         is_student = len(students) > 0
         is_owner = owner_id == authenticated_user.id
@@ -109,8 +139,7 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
         authenticated_user_id = self.request.user.id
 
         if owner_id != authenticated_user_id:
-            raise PermissionDenied(
-                "You must be the course owner to update this lesson")
+            raise PermissionDenied("You must be the course owner to update this lesson")
 
         serializer.save()
 
@@ -138,8 +167,7 @@ class ActivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied(
-                "You must be the course owner to update this lesson")
+            raise PermissionDenied("You must be the course owner to update this lesson")
 
         serializer.save(is_active=True)
 
@@ -159,7 +187,33 @@ class DeactivateLessonView(UpdateAPIView):
         owner_id = lesson.course.owner.id
 
         if authenticated_user_id != owner_id:
-            raise PermissionDenied(
-                "You must be the owner to update this lesson")
+            raise PermissionDenied("You must be the owner to update this lesson")
 
         serializer.save(is_active=False)
+
+
+class CompleteLessonView(UpdateAPIView):
+    serializer_class = ToggleCompletedSerializer
+    queryset = Lesson.objects.all()
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        lesson = get_object_or_404(Lesson, "Lesson not found", pk=self.kwargs["pk"])
+
+        lesson.students_lessons.filter
+
+        course_id = lesson.course.id
+
+        student = get_object_or_404(
+            Student,
+            "You did not buy this course",
+            student=self.request.user.id,
+            course=course_id,
+        )
+
+        return student.lessons.get(lesson=lesson.id)
+
+    def perform_update(self, serializer):
+        serializer.save(is_completed=True)

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from students_lessons.models import StudentLessons
 from tasks.models import Task
 from tasks.serializers import TaskSerializer
 
@@ -81,3 +82,12 @@ class ToggleLessonSerializer(serializers.ModelSerializer):
         fields = ["is_active"]
 
         read_only_fields = ["is_active"]
+
+
+class ToggleCompletedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentLessons
+
+        fields = ["is_completed"]
+
+        read_only_fields = ["is_completed"]
