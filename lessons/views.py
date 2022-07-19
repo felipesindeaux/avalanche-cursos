@@ -55,7 +55,7 @@ class ListCreateLessonView(ListCreateAPIView):
                 """
                     O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
 
-                    Pronto para {lesson_name}?
+                    Pronto para {lesson_name}? 🥵
                 """.format(course_name=course.title.title(), lesson_name=lesson.title.title()),
                 None,
                 students_emails
