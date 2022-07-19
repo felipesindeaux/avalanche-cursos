@@ -9,7 +9,7 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from students_lessons.models import StudentLessons
-from utils import get_object_or_404, validate_uuid
+from utils import get_object_or_404
 
 from .models import Lesson
 from .serializers import LessonSerializer, ToggleLessonSerializer
@@ -30,9 +30,8 @@ class ListCreateLessonView(ListCreateAPIView):
             )
 
     def perform_create(self, serializer):
-        uuid = validate_uuid(self.kwargs["course_id"])
 
-        course = get_object_or_404(Course, "Course not found", id=uuid)
+        course = get_object_or_404(Course, "Course not found", id=self.kwargs["course_id"])
 
         owner_id = course.owner.id
         authenticated_user_id = self.request.user.id

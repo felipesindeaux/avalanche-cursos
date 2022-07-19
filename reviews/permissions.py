@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import permissions
 from rest_framework.exceptions import NotAcceptable
 from students.models import Student
-from utils import get_object_or_404, validate_uuid
+from utils import get_object_or_404
 
 
 class IsReviewOwner(permissions.BasePermission):
