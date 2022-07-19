@@ -1,5 +1,5 @@
 from courses.models import Course
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (ListCreateAPIView,
@@ -46,20 +46,26 @@ class ListCreateLessonView(ListCreateAPIView):
         all_course_students = course.students.all()
 
         if len(all_course_students):
-            students_emails = [
-                student.student.email for student in all_course_students
-            ]
+            email_messages = (
+                (
+                    f"New Lesson of {course.title.title()}",
+                    """
+                        Olá {student_name}, tudo bem?
 
-            send_mail(
-                f"New Lesson of {course.title.title()}",
-                """
-                    O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
+                        O curso {course_name} da Avalanche Cursos®™ foi atualizado e tem uma nova lição!
 
-                    Pronto para {lesson_name}? 🥵
-                """.format(course_name=course.title.title(), lesson_name=lesson.title.title()),
-                None,
-                students_emails
+                        Pronto para {lesson_name}? 🥵
+                    """.format(
+                        student_name=student.student.name.title(),
+                        course_name=course.title.title(),
+                        lesson_name=lesson.title.title()
+                    ),
+                    None,
+                    [student.student.email]
+                ) for student in all_course_students
             )
+
+            send_mass_mail(email_messages)
 
             lesson_students = [
                 StudentLessons(student=student, lesson=lesson)
