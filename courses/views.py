@@ -16,8 +16,9 @@ from courses.serializers import (CourseSerializer, ListCourseSerializer,
 
 from .permissions import (IsOwner, IsOwnerAndAdminToDelete, IsStudent,
                           IsTeacherOrReadOnly, StudentHaventCourse)
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(tags=['Courses'])
 class CreateListCourseView(SerializerByMethodMixin, generics.ListCreateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -50,7 +51,7 @@ class CreateListCourseView(SerializerByMethodMixin, generics.ListCreateAPIView):
 
         serializer.save(owner=self.request.user)
 
-
+@extend_schema(tags=['Courses'])
 class RetrieveUpdateDestroyView(
     SerializerByMethodMixin, generics.RetrieveUpdateDestroyAPIView
 ):
@@ -64,7 +65,7 @@ class RetrieveUpdateDestroyView(
 
     queryset = Course.objects.all()
 
-
+@extend_schema(tags=['Courses'])
 class ListCoursesView(SerializerByUserRoleMixin, generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -110,7 +111,7 @@ class ListCoursesView(SerializerByUserRoleMixin, generics.ListAPIView):
 
             return Student.objects.filter(student=self.request.user)
 
-
+@extend_schema(tags=['Courses'])
 class ActivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -122,7 +123,7 @@ class ActivateCourseView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         serializer.save(is_active=True)
 
-
+@extend_schema(tags=['Courses'])
 class DeactivateCourseView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -134,7 +135,7 @@ class DeactivateCourseView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         serializer.save(is_active=False)
 
-
+@extend_schema(tags=['Courses'])
 class CompleteCoursesView(generics.UpdateAPIView):
 
     serializer_class = StudentsSerializer
@@ -154,7 +155,7 @@ class CompleteCoursesView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         serializer.save(is_completed=True)
 
-
+@extend_schema(tags=['Courses'])
 class BuyCoursesView(generics.CreateAPIView):
 
     serializer_class = StudentsSerializer

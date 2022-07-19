@@ -7,6 +7,9 @@ from django.dispatch import receiver
 from django_rest_passwordreset.signals import reset_password_token_created
 
 from users.utils import CustomUserManager
+from drf_spectacular.utils import extend_schema
+
+
 
 
 class User(AbstractUser):
@@ -23,7 +26,6 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
-
 
 @receiver(reset_password_token_created)
 def password_reset_token_created(

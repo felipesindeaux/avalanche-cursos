@@ -1,6 +1,8 @@
 from rest_framework import serializers
-
+from drf_spectacular.utils import extend_schema_serializer,OpenApiExample
 from .models import User
+
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -23,10 +25,18 @@ class UserNameSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
+@extend_schema_serializer(examples=[OpenApiExample(
+    "login response example",
+    value={
+        "token": "authentication token(uuid)"
+    }, response_only=True
+)])
 class LoginSerializer(serializers.Serializer):
 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+    
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):

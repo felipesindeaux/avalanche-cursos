@@ -7,8 +7,9 @@ from questions.permissions import IsOwnerAndAdminToDelete
 
 from .models import Question
 from .serializers import QuestionSerializer
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(tags=['Questions'])
 class ListCreateQuestionView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -28,7 +29,7 @@ class ListCreateQuestionView(generics.ListCreateAPIView):
 
         return Question.objects.all()
 
-
+@extend_schema(tags=['Questions'])
 class RetrieveUpdateDestroyQuestionView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
