@@ -1,3 +1,5 @@
+from turtle import update
+from venv import create
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
@@ -6,13 +8,13 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import NotAcceptable
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView, Response, status
+from drf_spectacular.utils import extend_schema
 
 from .mixins import SerializerByMethodMixin
 from .models import User
 from .serializers import (LoginSerializer, UpdateUserSerializer,
                           UpdateUserStatusSerializer, UserSerializer)
-
-
+@extend_schema(tags=['Users'])
 class ManagementUserView(generics.UpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -30,7 +32,7 @@ class ManagementUserView(generics.UpdateAPIView):
         else:
             raise NotAcceptable("You cannot deactivate yourself.")
 
-
+@extend_schema(tags=['Users'])
 class ListUsersView(generics.ListAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -39,7 +41,7 @@ class ListUsersView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
+@extend_schema(tags=['Users'])
 class RetrieveUpdateUserView(SerializerByMethodMixin, generics.RetrieveUpdateAPIView):
 
     authentication_classes = [TokenAuthentication]
@@ -61,16 +63,17 @@ class RetrieveUpdateUserView(SerializerByMethodMixin, generics.RetrieveUpdateAPI
 
         return obj
 
-
+@extend_schema(tags=['Users'])
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
+@extend_schema(tags=['Login'])
 class LoginView(APIView):
     queryset = User.objects.all()
     serializer_class = LoginSerializer
 
+    
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 

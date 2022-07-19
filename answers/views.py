@@ -8,8 +8,9 @@ from answers.permissions import IsOwnerAndAdminToDelete
 
 from .models import Answer
 from .serializers import AnswerSerializer, AnswerSerializerDetail
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(tags=['Answers'])
 class ListCreateAnswerView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -27,7 +28,7 @@ class ListCreateAnswerView(generics.ListCreateAPIView):
         get_object_or_404(Question, pk=question_id)
         return Answer.objects.filter(question_id=question_id)
 
-
+@extend_schema(tags=['Answers'])
 class RetrieveUpdateDestroyAnswerView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerAndAdminToDelete]

@@ -18,8 +18,9 @@ from .serializers import (
     RetrieveLessonSerializer,
     ToggleLessonSerializer
 )
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(tags=['Lessons'])
 class ListCreateLessonView(ListCreateAPIView):
     serializer_class = LessonSerializer
 
@@ -79,7 +80,7 @@ class ListCreateLessonView(ListCreateAPIView):
 
             StudentLessons.objects.bulk_create(lesson_students)
 
-
+@extend_schema(tags=['Lessons'])
 class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
     serializer_class = RetrieveLessonSerializer
     queryset = Lesson.objects.all()
@@ -127,7 +128,7 @@ class RetrieveUpdateDeleteLessonView(RetrieveUpdateDestroyAPIView):
 
         instance.delete()
 
-
+@extend_schema(tags=['Lessons'])
 class ActivateLessonView(UpdateAPIView):
     serializer_class = ToggleLessonSerializer
     queryset = Lesson.objects.all()
@@ -148,7 +149,7 @@ class ActivateLessonView(UpdateAPIView):
 
         serializer.save(is_active=True)
 
-
+@extend_schema(tags=['Lessons'])
 class DeactivateLessonView(UpdateAPIView):
     serializer_class = ToggleLessonSerializer
     queryset = Lesson.objects.all()
