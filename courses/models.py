@@ -1,5 +1,6 @@
-from django.db import models
 import uuid
+
+from django.db import models
 
 
 class Course(models.Model):
@@ -17,4 +18,5 @@ class Course(models.Model):
     owner = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="courses"
     )
-    categories = models.ManyToManyField("categories.Category", related_name="courses")
+    categories = models.ManyToManyField(
+        "categories.Category", related_name="courses")

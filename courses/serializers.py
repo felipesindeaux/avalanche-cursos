@@ -1,8 +1,7 @@
 from categories.models import Category
 from categories.serializers import CategorySerializer
-from rest_framework import serializers
 from lessons.models import Lesson
-
+from rest_framework import serializers
 from users.serializers import UserNameSerializer
 
 from .models import Course
