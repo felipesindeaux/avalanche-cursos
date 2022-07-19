@@ -6,7 +6,6 @@ from rest_framework.permissions import (IsAuthenticated,
 from students.models import Student
 from students.serializers import StudentsSerializer
 from students_lessons.models import StudentLessons
-from students_lessons.serializers import StudentsLessonsSerializer
 from utils.get_object_or_404 import get_object_or_404
 
 from courses.mixins import SerializerByMethodMixin, SerializerByUserRoleMixin
