@@ -302,40 +302,119 @@ class TestUpdateTasksViews(APITestCase):
         )
 
     def test_update_task_with_student(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.patch(
+            f"/api/tasks/{self.tasks.id}/",
+            data={"title": "Update Teste"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_update_task_with_teacher_owner(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.patch(
+            f"/api/tasks/{self.tasks.id}/",
+            data={"title": "Update Teste"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("title", response.data)
+        self.assertEqual("Update Teste", response.data["title"])
 
     def test_update_task_with_teacher_not_owner(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+
+        response = self.client.patch(
+            f"/api/tasks/{self.tasks.id}/",
+            data={"title": "Update Teste"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_update_task_with_admin(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+
+        response = self.client.patch(
+            f"/api/tasks/{self.tasks.id}/",
+            data={"title": "Update Teste"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_activate_task_with_teacher_owner(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_active", response.data)
+        self.assertTrue(response.data["is_active"])
 
     def test_activate_task_with_teacher_not_owner(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_activate_task_with_student(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_activate_task_with_admin(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_deactivate_task_with_teacher_owner(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/deactivate/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_active", response.data)
+        self.assertFalse(response.data["is_active"])
 
     def test_deactivate_task_with_teacher_not_owner(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_deactivate_task_with_student(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
     def test_deactivate_task_with_admin(self):
-        ...
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
+
+        response = self.client.patch(f"/api/tasks/{self.tasks.id}/activate/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
 
 
 class TestDeleteTasksViews(APITestCase):
@@ -364,14 +443,33 @@ class TestDeleteTasksViews(APITestCase):
 
         cls.tasks = Task.objects.create(**TASK_DATA, lesson=cls.lesson_1)
 
-    def test_deactivate_task_with_admin(self):
-        ...
+    def test_delete_task_with_admin(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_admin.key)
 
-    def test_deactivate_task_with_teacher_owner(self):
-        ...
+        response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
 
-    def test_deactivate_task_with_teacher_not_owner(self):
-        ...
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_deactivate_task_with_student(self):
-        ...
+    def test_delete_task_with_teacher_owner(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher.key)
+
+        response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_delete_task_with_teacher_not_owner(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_teacher_2.key)
+
+        response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
+
+    def test_delete_task_with_student(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token_student.key)
+
+        response = self.client.delete(f"/api/tasks/{self.tasks.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("detail", response.data)
