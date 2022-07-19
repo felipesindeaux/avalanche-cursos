@@ -1,25 +1,25 @@
-from rest_framework import permissions
-from courses.models import Course
-from lessons.models import Lesson
-from students.models import Student
-from django.core.exceptions import ObjectDoesNotExist
-from tasks.models import Task
 
+from courses.models import Course
+from django.core.exceptions import ObjectDoesNotExist
+from lessons.models import Lesson
+from rest_framework import permissions
+from students.models import Student
 from utils import get_object_or_404
 
+from tasks.models import Task
 
 
 
 class IsTeacherOwner(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        
+    
         lesson_id = view.kwargs.get("lesson_id")
         lesson = get_object_or_404(Lesson, pk=lesson_id)
         course = get_object_or_404(Course, pk=lesson.course_id)
 
         return course.owner == request.user
-           
+
 
 class IsTeacherOwnerTask(permissions.BasePermission):
 
@@ -29,13 +29,15 @@ class IsTeacherOwnerTask(permissions.BasePermission):
         lesson = get_object_or_404(Lesson, pk=task.lesson.id)
         course = get_object_or_404(Course, pk=lesson.course_id)
         return course.owner == request.user
-                
+
 
 class IsAdmServer(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        
+
+
         return request.user.is_superuser
+
 
 class HasCourseBondTaks(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -47,7 +49,9 @@ class HasCourseBondTaks(permissions.BasePermission):
         lesson = get_object_or_404(Lesson, pk=task.lesson.id)
         course = get_object_or_404(Course, pk=lesson.course_id)
         if course.owner == request.user:
-                return True 
+
+            return True
+
 
         if request.method in permissions.SAFE_METHODS:
             if request.user.is_superuser:
@@ -57,8 +61,11 @@ class HasCourseBondTaks(permissions.BasePermission):
                 return True
             except ObjectDoesNotExist:
                 return False
-        
+
+
         return False
+
+
 
 class HasCourseBond(permissions.BasePermission):
 
@@ -68,12 +75,16 @@ class HasCourseBond(permissions.BasePermission):
             lesson = get_object_or_404(Lesson, pk=lesson_id)
             course = get_object_or_404(Course, pk=lesson.course_id)
             if course.owner == request.user or request.user.is_superuser:
-                return True 
+
+                return True
+
 
             try:
                 Student.objects.get(course=course, student=request.user)
                 return True
             except ObjectDoesNotExist:
                 return False
-        
+
+
         return False
+

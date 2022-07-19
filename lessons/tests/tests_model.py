@@ -1,9 +1,7 @@
-from django.test import TestCase
-
-from lessons.models import Lesson
-from lessons.serializers import LessonSerializer
-from users.models import User
 from courses.models import Course
+from django.test import TestCase
+from lessons.models import Lesson
+from users.models import User
 
 
 class LessonTest(TestCase):

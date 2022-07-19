@@ -9,12 +9,8 @@ from rest_framework.views import APIView, Response, status
 
 from .mixins import SerializerByMethodMixin
 from .models import User
-from .serializers import (
-    LoginSerializer,
-    UpdateUserSerializer,
-    UpdateUserStatusSerializer,
-    UserSerializer,
-)
+from .serializers import (LoginSerializer, UpdateUserSerializer,
+                          UpdateUserStatusSerializer, UserSerializer)
 
 
 class ManagementUserView(generics.UpdateAPIView):

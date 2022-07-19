@@ -1,6 +1,4 @@
-from courses.serializers import CourseSerializer
 from rest_framework import serializers
-from users.serializers import UserSerializer
 
 from reviews.models import Review
 

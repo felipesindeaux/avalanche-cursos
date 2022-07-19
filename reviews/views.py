@@ -2,7 +2,7 @@ from courses.models import Course
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from utils import get_object_or_404, validate_uuid
+from utils import get_object_or_404
 
 from reviews.models import Review
 from reviews.permissions import IsReviewOwner, StudentHaveCourse

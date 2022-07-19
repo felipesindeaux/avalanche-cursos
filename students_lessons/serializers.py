@@ -1,5 +1,3 @@
-from os import read
-
 from lessons.serializers import LessonSerializer
 from rest_framework import serializers
 from students.serializers import StudentsSerializer
