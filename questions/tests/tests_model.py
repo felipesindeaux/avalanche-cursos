@@ -1,11 +1,12 @@
-from django.test import TestCase
-from categories.models import Category
-from users.models import User
-from questions.models import Question
 from datetime import datetime as dt
 
+from categories.models import Category
+from django.test import TestCase
+from questions.models import Question
+from users.models import User
 
-class AnswerTest(TestCase):
+
+class QuestionTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(

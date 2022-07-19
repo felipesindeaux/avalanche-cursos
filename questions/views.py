@@ -1,14 +1,16 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
-
-from questions.permissions import IsOwnerAndAdminToDelete
-from .models import Question
-from .serializers import QuestionSerializer
-
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from questions.permissions import IsOwnerAndAdminToDelete
 
+from .models import Question
+from .serializers import QuestionSerializer, QuestionDetailSerializer
+
+
+@extend_schema(tags=["Questions"])
 class ListCreateQuestionView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -29,12 +31,13 @@ class ListCreateQuestionView(generics.ListCreateAPIView):
         return Question.objects.all()
 
 
+@extend_schema(tags=["Questions"])
 class RetrieveUpdateDestroyQuestionView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerAndAdminToDelete]
 
-    serializer_class = QuestionSerializer
+    serializer_class = QuestionDetailSerializer
     lookup_url_kwarg = "question_id"
 
     def get_queryset(self):

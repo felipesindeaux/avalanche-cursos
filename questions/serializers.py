@@ -1,26 +1,22 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers
 from answers.models import Answer
 from categories.models import Category
 from categories.serializers import CategorySerializer
+from rest_framework import serializers
 
-from users.serializers import UserIdSerializer
 from .models import Question
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    user = UserIdSerializer(read_only=True)
-    categories = CategorySerializer(many=True)
-    
+
     answers_count = serializers.SerializerMethodField()
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Question
         fields = "__all__"
         depth = 1
-    
-    def create(self, validated_data: dict):
 
+    def create(self, validated_data: dict):
         categories = validated_data.pop("categories")
 
         question = Question.objects.create(**validated_data)
@@ -33,6 +29,44 @@ class QuestionSerializer(serializers.ModelSerializer):
         question.categories.set(list_categories)
 
         return question
+
+    def get_answers_count(self, question: Question):
+        answers_count = Answer.objects.filter(question_id=question.id).count()
+        return answers_count
+
+    def to_representation(self, instance):
+        data = super(QuestionSerializer, self).to_representation(instance)
+        categories = map(lambda data: data["name"], data["categories"])
+        data = {
+            "id": data["id"],
+            "title": data["title"],
+            "description": data["description"],
+            "answers_count": data["answers_count"],
+            "date_published": data["date_published"],
+            "updated_at": data["updated_at"],
+            "user_id": data["user"]["id"],
+            "categories": categories,
+        }
+        return data
+
+
+class QuestionDetailSerializer(serializers.ModelSerializer):
+
+    # categories = CategorySerializer(many=True)
+
+    class Meta:
+        model = Question
+        fields = [
+            "id",
+            "title",
+            "description",
+            "date_published",
+            "updated_at",
+            "user_id",
+            "categories",
+            "answers",
+        ]
+        depth = 1
 
     def update(self, instance: Question, validated_data: dict):
 
@@ -56,22 +90,15 @@ class QuestionSerializer(serializers.ModelSerializer):
 
         return instance
 
-
-    def get_answers_count(self, question: Question):
-        answers_count = Answer.objects.filter(question_id=question.id).count()
-        return answers_count
-
     def to_representation(self, instance):
-        data = super(QuestionSerializer, self).to_representation(instance)
-        categories = map(lambda data: data['name'], data['categories'])
-        data = {
-            "id": data["id"],
-            "title": data["title"],
-            "description": data["description"],
-            "answers_count": data["answers_count"],
-            "date_published": data["date_published"],
-            "updated_at": data["updated_at"],
-            "user_id": data["user"]["id"],
-            "categories": categories,
-        }
-        return data
+        data = super(QuestionDetailSerializer, self).to_representation(instance)
+        categories = map(lambda data: data["name"], data["categories"])
+        answers = map(
+            lambda data: {
+                "user_id": data["user"],
+                "content": data["content"],
+                "date_published": data["date_published"],
+            },
+            data["answers"],
+        )
+        return {**data, "categories": categories, "answers": answers}

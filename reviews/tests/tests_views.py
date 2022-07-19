@@ -1,20 +1,13 @@
+from courses.models import Course
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.views import status
-from courses.models import Course
 from reviews.models import Review
-
 from users.models import User
 
+REVIEW_DATA = {"score": 5, "comment": "muito boin"}
 
-REVIEW_DATA = {
-	"score": 5,
-	"comment": "muito boin"
-}
-
-UPDATE_REVIEW_DATA ={
-    "comment": "atualizado"
-}
+UPDATE_REVIEW_DATA = {"comment": "atualizado"}
 
 COURSE_DATA = {
     "title": "Titulo",
@@ -37,12 +30,12 @@ USER_REVEIWER_DATA = {
     "is_teacher": False,
 }
 
-class ReviewViewTest(APITestCase):
 
+class ReviewViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        teacher = User.objects.create_user(**USER_OWNER_COURSE_DATA )
-        student = User.objects.create_user(**USER_REVEIWER_DATA)   
+        teacher = User.objects.create_user(**USER_OWNER_COURSE_DATA)
+        student = User.objects.create_user(**USER_REVEIWER_DATA)
 
         cls.teacher_token = Token.objects.create(user=teacher)
         cls.student_token = Token.objects.create(user=student)
@@ -51,16 +44,17 @@ class ReviewViewTest(APITestCase):
 
         cls.course.save()
 
-        cls.review = Review.objects.create(**REVIEW_DATA, user=student, course=cls.course)
+        cls.review = Review.objects.create(
+            **REVIEW_DATA, user=student, course=cls.course
+        )
 
         cls.review.save()
-
 
     def create_review_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
         response = self.client.post(
-            f'/api/review/course/{self.course.id}/', data=REVIEW_DATA
+            f"/api/review/course/{self.course.id}/", data=REVIEW_DATA
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -90,15 +84,15 @@ class ReviewViewTest(APITestCase):
     def test_update_review(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
-        response = self.client.patch(f'/api/review/{self.review.id}/', UPDATE_REVIEW_DATA)
+        response = self.client.patch(
+            f"/api/review/{self.review.id}/", UPDATE_REVIEW_DATA
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
     def test_delete_review(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.student_token.key)
 
-        response = self.client.delete(f'/api/review/{self.review.id}/')
+        response = self.client.delete(f"/api/review/{self.review.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-

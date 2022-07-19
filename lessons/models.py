@@ -1,7 +1,7 @@
-from django.db import models
-from django.core.validators import FileExtensionValidator
-from django.utils import timezone
 import uuid
+
+from django.core.validators import FileExtensionValidator
+from django.db import models
 
 
 class Lesson(models.Model):
@@ -9,9 +9,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
     video = models.FileField(
-        null=True, validators=[
-            FileExtensionValidator(allowed_extensions=["mp4"])
-        ]
+        null=True, validators=[FileExtensionValidator(allowed_extensions=["mp4"])]
     )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

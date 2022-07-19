@@ -67,7 +67,7 @@ class TestUserView(APITestCase):
         response = self.client.get("/api/users/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(2, len(response.data))
+        self.assertEqual(2, len(response.data["results"]))
 
     def test_retrieve_my_user_without_token(self):
 

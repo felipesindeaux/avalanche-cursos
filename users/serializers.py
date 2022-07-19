@@ -1,19 +1,13 @@
+from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
 from rest_framework import serializers
 
 from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = [
-            "id",
-            "name",
-            "email",
-            "is_teacher",
-            "password"
-        ]
+        fields = ["id", "name", "email", "is_teacher", "password"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -25,23 +19,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserNameSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = [
-            "id",
-            "name"
-        ]
-
-class UserIdSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = [
-            "id",
-        ]
+        fields = ["id", "name"]
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "login response example",
+            value={"token": "authentication token(uuid)"},
+            response_only=True,
+        )
+    ]
+)
 class LoginSerializer(serializers.Serializer):
 
     email = serializers.EmailField()
@@ -49,26 +40,25 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = [
-            "id",
-            "name",
-            "email",
-            "is_teacher",
-            "password",
-        ]
+
+        exclude = (
+            "is_active",
+            "last_login",
+            "is_superuser",
+            "is_staff",
+            "date_joined",
+            "groups",
+            "user_permissions",
+        )
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = [
             "is_teacher",
         ]
 
 
-# Serializer de ativação/desativação de usuários (somente ADM)
 class UpdateUserStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            "is_active"
-        ]
+        fields = ["is_active"]

@@ -122,7 +122,7 @@ class TestCreateCourseViews(APITestCase):
         response = self.client.get("/api/courses/me/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, len(response.data["results"]))
 
 
 class TestListCoursesTeacherViews(APITestCase):
@@ -157,7 +157,7 @@ class TestListCoursesTeacherViews(APITestCase):
         response = self.client.get(f"/api/courses/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
     def test_list_one_course(self):
 
@@ -176,7 +176,7 @@ class TestListCoursesTeacherViews(APITestCase):
         response = self.client.get(f"/api/courses/me/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(2, len(response.data))
+        self.assertEqual(2, len(response.data["results"]))
 
     def test_list_all_course_created_by_the_teacher_active(self):
 
@@ -185,7 +185,7 @@ class TestListCoursesTeacherViews(APITestCase):
         response = self.client.get(f"/api/courses/me/?active=true")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
     def test_list_all_course_created_by_the_teacher_deactive(self):
 
@@ -194,7 +194,7 @@ class TestListCoursesTeacherViews(APITestCase):
         response = self.client.get(f"/api/courses/me/?active=false")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
 
 class TestListCoursesStudentViews(APITestCase):
@@ -231,7 +231,7 @@ class TestListCoursesStudentViews(APITestCase):
         response = self.client.get(f"/api/courses/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(2, len(response.data))
+        self.assertEqual(2, len(response.data["results"]))
 
     def test_list_one_course(self):
 
@@ -251,7 +251,7 @@ class TestListCoursesStudentViews(APITestCase):
         response = self.client.get(f"/api/courses/me/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
     def test_list_all_course_completed_by_the_student(self):
 
@@ -262,7 +262,7 @@ class TestListCoursesStudentViews(APITestCase):
         response = self.client.get(f"/api/courses/me/?completed=completed")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
     def test_list_all_course_uncompleted_by_the_student(self):
 
@@ -272,7 +272,7 @@ class TestListCoursesStudentViews(APITestCase):
         response = self.client.get(f"/api/courses/me/?completed=uncompleted")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.data))
+        self.assertEqual(1, len(response.data["results"]))
 
 
 class TestBuyCoursesViews(APITestCase):

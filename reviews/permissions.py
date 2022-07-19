@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import permissions
 from rest_framework.exceptions import NotAcceptable
 from students.models import Student
-from utils import get_object_or_404, validate_uuid
+from utils import get_object_or_404
 
 
 class IsReviewOwner(permissions.BasePermission):
@@ -16,12 +16,11 @@ class IsReviewOwner(permissions.BasePermission):
 
 class StudentHaveCourse(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_superuser:
-            return False
+        if request.method in permissions.SAFE_METHODS:
+            return True
 
         course_id = view.kwargs.get("course_id")
-        validate_uuid(course_id)
-        course = get_object_or_404(Course,'Course not found!', pk=course_id)
+        course = get_object_or_404(Course, detail="Course not found", pk=course_id)
         try:
             Student.objects.get(course=course, student=request.user)
             return True
