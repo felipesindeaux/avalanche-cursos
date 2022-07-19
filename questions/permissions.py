@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
 from questions.models import Question
-from users.models import User
 
 
 class IsOwnerAndAdminToDelete(permissions.BasePermission):
