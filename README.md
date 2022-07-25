@@ -20,7 +20,7 @@ Pessoas de todos os tipos poderão criar e oferecer cursos de todos os tipos, se
 
 - Django
     - django-rest-framework
-    - e é isso aí kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+    
     
 
 # Padrões do projeto
