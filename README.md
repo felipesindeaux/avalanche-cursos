@@ -13,9 +13,9 @@ A plataforma também conta com um sistema de fórum livre (para usuários) onde 
 
 Utilizamos do framework **Django** em conjuto ao **django-rest-framework** para a construção de uma API seguindo os padrões _REST_, ela também conta com o sistema de gerenciamento de banco de dados _SQL_, **PostgreSQL**, para se persistir o fluxo de dados. Também foi utilizado do **AWS S3** para o armanezamento de vídeos e do docker em conjunto ao docker-compose para auxílio no ambiente de desenvolvimento.
 
-<a href="https://avalanche-cursos.herokuapp.com/api/docs/" alt="Swagger docs" target="_blank">
 
 ## Documentação das rotas com swagger
+<a href="https://avalanche-cursos.herokuapp.com/api/docs/" alt="Swagger docs" target="_blank">
 
 ![Link na web](https://img.shields.io/badge/docs-swagger-green)
 
